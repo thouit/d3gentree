@@ -49,13 +49,19 @@ centerText.append("text")//
 .text(data.source.fname.substring(0, Math.min((param.centerSize * 2 / 9) + 1, data.source.fname.length + 1)));
 
 if (param.angleStart != undefined && param.angleStop != undefined){
-	drawAscendants(1, param.centerSize,  -param.angleStart + Math.PI/2.0, - param.angleStop + Math.PI/2.0, 1);
+	drawAscendants(data, 1, param.centerSize,  -param.angleStart + Math.PI/2.0, - param.angleStop + Math.PI/2.0, 1);
+	/*if (param.angleStart2 != undefined && param.angleStop2 != undefined){
+		drawAscendants(data2, 1, param.centerSize,  -param.angleStart2 + Math.PI/2.0, - param.angleStop2 + Math.PI/2.0, 1);
+	}*/
 } else { 
-	drawAscendants(1, param.centerSize, param.angle / 2, -param.angle / 2, 1);
+	drawAscendants(data, 1, param.centerSize, param.angle / 2, -param.angle / 2, 1);
 }
+
+
+
 drawDescendant(data.source, param.centerSize, Math.PI + param.angleDesc / 2, Math.PI - param.angleDesc / 2, 0, 0);
 
-function drawAscendants(sosa, inR_orig, startA_orig, endA_orig, orient) {
+function drawAscendants(dataSource, sosa, inR_orig, startA_orig, endA_orig, orient) {
 	generation = parseInt(sosa).toString(2).length - 1;
 	branch = sosa - Math.pow(2, generation);
 	if (generation > param.expandStart) {
@@ -67,18 +73,18 @@ function drawAscendants(sosa, inR_orig, startA_orig, endA_orig, orient) {
 	}
 	var outR = inR_orig + thisR;
 	pers = undefined;
-	if (generation > 0 && data.ancestors[generation - 1]) {
-		pers = data.ancestors[generation-1][branch];
+	if (generation > 0 && dataSource.ancestors[generation - 1]) {
+		pers = dataSource.ancestors[generation-1][branch];
 		if (pers) {
-			data.ancestors[generation - 1][branch].index = sosa;
+			dataSource.ancestors[generation - 1][branch].index = sosa;
 			invert = startA_orig <= 0 ? true : false
 			drawPersCell(pers, inR_orig + param.padding / 2, outR - param.padding / 2, startA_orig, endA_orig, generation, orient, radialText, invert, true);
 		}
 	}
-	if (generation < data.ancestors.length) {
+	if (generation < dataSource.ancestors.length) {
 		var midA = (startA_orig + endA_orig) / 2;
-		drawAscendants(2 * sosa, outR, startA_orig, midA, orient);
-		drawAscendants(2 * sosa + 1, outR, midA, endA_orig, orient);
+		drawAscendants(dataSource, 2 * sosa, outR, startA_orig, midA, orient);
+		drawAscendants(dataSource, 2 * sosa + 1, outR, midA, endA_orig, orient);
 	}
 }
 
@@ -148,7 +154,8 @@ function drawPersCell(person, inR, outR, startA, endA, generation, orient, radia
 
 	var elem = vis.append("svg:path")//
 	.attr("d", myarc(inR, outR, startA, endA, orient))//
-	.attr("transform", "translate(" + xShift + "," + yShift + ")").attr("fill", function() {
+	.attr("transform", "translate(" + xShift + "," + yShift + ")")//
+	.attr("fill", function() {
 		if (isAsc){
 			if (person.gender == "H") 
 				return d3.rgb(param.colors[generation%param.colors.length][0], param.colors[generation%param.colors.length][1], param.colors[generation%param.colors.length][2]);
@@ -160,7 +167,8 @@ function drawPersCell(person, inR, outR, startA, endA, generation, orient, radia
 		}
 	}).style("stroke-width", param.padding * 2)//
 	.style("stroke", param.strokeColor)//
-	.attr("class", "arc " + generation + " branch").attr("id", person.index)//;//
+	.attr("class", "arc " + generation + " branch")//
+	.attr("id", person.index);//
 
 	var text = vis.append("g")//
 	.attr("class", "text");

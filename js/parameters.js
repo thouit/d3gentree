@@ -6,7 +6,7 @@ var param = {
 	//colorsDesc : [[245, 245, 250], [250, 245, 250]],
 	strokeColor : "#BBB",
 	expandStart : 2,
-	oneLineNameStart : 7,
+	oneLineNameStart : 6,
 	oneLineNameStartDesc: 5,
 	stopDisplayName : 9,
 	radius : 55,
@@ -21,6 +21,8 @@ var param = {
 	angle : 1.2 * Math.PI,
 	angleStart : -0.1*Math.PI,//Math.PI/2.0,// please respect trigo direction
 	angleStop : Math.PI/2.0, //Math.PI*1.1,// please respect trigo direction
+	angleStart2 : Math.PI/2.0,
+	angleStop2 : Math.PI*1.1,
 	angleDesc : 0.8 * Math.PI, // if <0 then take the remaining space
 	padding : 0.1,
 	navigator : 2, //2 for chrome, 1 for Firefox
