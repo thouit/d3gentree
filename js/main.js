@@ -53,7 +53,7 @@ if (param.angleStart != undefined && param.angleStop != undefined){
 } else { 
 	drawAscendants(1, param.centerSize, param.angle / 2, -param.angle / 2, 1);
 }
-drawDescendant(data.source, param.centerSize, Math.PI - param.angleDesc / 2, Math.PI + param.angleDesc / 2, 0, 0);
+drawDescendant(data.source, param.centerSize, Math.PI + param.angleDesc / 2, Math.PI - param.angleDesc / 2, 0, 0);
 
 function drawAscendants(sosa, inR_orig, startA_orig, endA_orig, orient) {
 	generation = parseInt(sosa).toString(2).length - 1;
@@ -101,7 +101,7 @@ function drawDescendant(indivData, inR_orig, startA_orig, endA_orig, generation,
 		var inR = inR_orig;
 		var outR_s = inR + (generation > param.expandStartDesc ? param.radiusRadial : param.radius);
 		indivData.marriages[m].spouse.index = indivData.index + "-" + m;
-		invert = startA_s >= Math.PI ? true : false
+		invert = startA_s > Math.PI ? true : false
 		drawPersCell(indivData.marriages[m].spouse, inR + param.padding / 2, outR_s - param.padding / 2, startA_s, endA_s, generation, (generation > param.expandStartDesc ? 1 : orient), (generation > param.expandStartDesc ? 1 : 0), invert, false)
 
 		for (var c = 0; c < indivData.marriages[m].children.length; ++c) {
@@ -111,7 +111,7 @@ function drawDescendant(indivData, inR_orig, startA_orig, endA_orig, generation,
 			var inR = outR_s + param.descGenerationSpacing;
 			var outR = inR + (generation + 1 > param.expandStartDesc ? param.radiusRadial : param.radius);
 			indivData.marriages[m].children[c].index = indivData.index + "-" + m + "." + c;
-			invert = startA >= Math.PI ? true : false
+			invert = startA > Math.PI ? true : false
 			drawPersCell(indivData.marriages[m].children[c], inR + param.padding / 2, outR - param.padding / 2, startA, endA, generation + 1, (generation + 1 > param.expandStartDesc ? 1 : orient), (generation + 1 > param.expandStartDesc ? 1 : 0), invert, false)
 			drawDescendant(indivData.marriages[m].children[c], outR, startA, endA, generation + 2, orient, (generation > param.expandStartDesc ? 1 : 0));
 		}
@@ -258,24 +258,24 @@ function drawPersCell(person, inR, outR, startA, endA, generation, orient, radia
 				.text(person.fname.substring(0, Math.min(maxLetter + 4, person.fname.length + 1)));
 
 				if (param.displayAdditionalInfo) {
-					if (isAsc?person.death:person.birth != null) {
+					if (person.death != null) {
 						text.append("text")//
 						.style("font-size", param.additionalInfoFontSize + "px")//
 						.style("text-anchor", "begin")//
 						.attr("dx", 2)//
-						.attr("dy", isAsc?-2:7)//
+						.attr("dy", -2)//
 						.attr("transform", "translate(" + xxxx + "," + yyyy + ") rotate(" + ((( orient ? 0 : 180) + (endA - Math.PI / 2) * 180 / Math.PI) + 180) + " 0 0)")//
-						.text(isAsc?person.death.date:person.birth.date);
+						.text(person.death.date);
 					}
 
-					if (isAsc?person.birth:person.death != null) {
+					if (person.birth != null) {
 						text.append("text")//
 						.style("font-size", param.additionalInfoFontSize + "px")//
 						.style("text-anchor", "begin")//
 						.attr("dx", 2)//
-						.attr("dy", isAsc?7:-2)
+						.attr("dy", 7)
 						.attr("transform", "translate(" + xxx + "," + yyy + ") rotate(" + ((( orient ? 0 : 180) + (startA - Math.PI / 2) * 180 / Math.PI) + 180) + " 0 0)")//
-						.text(isAsc?person.birth.date:person.death.date);
+						.text(person.birth.date);
 					}
 				}
 			} else {
@@ -304,24 +304,24 @@ function drawPersCell(person, inR, outR, startA, endA, generation, orient, radia
 				.text(person.fname.substring(0, Math.min(maxLetter + 4, person.fname.length + 1)));
 
 				if (param.displayAdditionalInfo) {
-					if (isAsc?person.birth:person.death != null) {
+					if (person.birth != null) {
 						text.append("text")//
 						.style("font-size", param.additionalInfoFontSize + "px")//
 						.style("text-anchor", "end")//
 						.attr("dx", -2)//
-						.attr("dy", isAsc?7:-2)//
+						.attr("dy", 7)//
 						.attr("transform", "translate(" + xxxx + "," + yyyy + ") rotate(" + ((( orient ? 0 : 180) + (endA - Math.PI / 2) * 180 / Math.PI)) + " 0 0)")//
-						.text(isAsc?person.birth.date:person.death.date);
+						.text(person.birth.date);
 					}
 
-					if (isAsc?person.death:person.birth != null) {
+					if (person.death != null) {
 						text.append("text")//
 						.style("font-size", param.additionalInfoFontSize + "px")//
 						.style("text-anchor", "end")//
 						.attr("dx", -2)//
-						.attr("dy", isAsc?-2:7)//
+						.attr("dy", -2)//
 						.attr("transform", "translate(" + xxx + "," + yyy + ") rotate(" + ((( orient ? 0 : 180) + (startA - Math.PI / 2) * 180 / Math.PI)) + " 0 0)")//
-						.text(isAsc?person.death.date:person.birth.date);
+						.text(person.death.date);
 					}
 				}
 			}
