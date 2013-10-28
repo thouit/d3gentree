@@ -48,7 +48,11 @@ centerText.append("text")//
 .attr("text-anchor", "middle")//
 .text(data.source.fname.substring(0, Math.min((param.centerSize * 2 / 9) + 1, data.source.fname.length + 1)));
 
-drawAscendants(1, param.centerSize, Math.PI + (2 * Math.PI - param.angle) / 2, Math.PI + (2 * Math.PI + param.angle) / 2, 1);
+if (param.angleStart != undefined && param.angleStop != undefined){
+	drawAscendants(1, param.centerSize,  -param.angleStart + Math.PI/2.0, - param.angleStop + Math.PI/2.0, 1);
+} else { 
+	drawAscendants(1, param.centerSize, param.angle / 2, -param.angle / 2, 1);
+}
 drawDescendant(data.source, param.centerSize, Math.PI - param.angleDesc / 2, Math.PI + param.angleDesc / 2, 0, 0);
 
 function drawAscendants(sosa, inR_orig, startA_orig, endA_orig, orient) {
@@ -67,7 +71,8 @@ function drawAscendants(sosa, inR_orig, startA_orig, endA_orig, orient) {
 		pers = data.ancestors[generation-1][branch];
 		if (pers) {
 			data.ancestors[generation - 1][branch].index = sosa;
-			drawPersCell(pers, inR_orig + param.padding / 2, outR - param.padding / 2, startA_orig, endA_orig, generation, orient, radialText, branch, true);
+			invert = startA_orig <= 0 ? true : false
+			drawPersCell(pers, inR_orig + param.padding / 2, outR - param.padding / 2, startA_orig, endA_orig, generation, orient, radialText, invert, true);
 		}
 	}
 	if (generation < data.ancestors.length) {
@@ -96,7 +101,8 @@ function drawDescendant(indivData, inR_orig, startA_orig, endA_orig, generation,
 		var inR = inR_orig;
 		var outR_s = inR + (generation > param.expandStartDesc ? param.radiusRadial : param.radius);
 		indivData.marriages[m].spouse.index = indivData.index + "-" + m;
-		drawPersCell(indivData.marriages[m].spouse, inR + param.padding / 2, outR_s - param.padding / 2, startA_s, endA_s, generation, (generation > param.expandStartDesc ? 1 : orient), (generation > param.expandStartDesc ? 1 : 0), (startA_s > Math.PI ? 1 : Math.pow(2, generation) / 2.0), false)
+		invert = startA_s >= Math.PI ? true : false
+		drawPersCell(indivData.marriages[m].spouse, inR + param.padding / 2, outR_s - param.padding / 2, startA_s, endA_s, generation, (generation > param.expandStartDesc ? 1 : orient), (generation > param.expandStartDesc ? 1 : 0), invert, false)
 
 		for (var c = 0; c < indivData.marriages[m].children.length; ++c) {
 			lengthA_c = (endA_s - startA_s) / indivData.marriages[m].children.length;
@@ -105,7 +111,8 @@ function drawDescendant(indivData, inR_orig, startA_orig, endA_orig, generation,
 			var inR = outR_s + param.descGenerationSpacing;
 			var outR = inR + (generation + 1 > param.expandStartDesc ? param.radiusRadial : param.radius);
 			indivData.marriages[m].children[c].index = indivData.index + "-" + m + "." + c;
-			drawPersCell(indivData.marriages[m].children[c], inR + param.padding / 2, outR - param.padding / 2, startA, endA, generation + 1, (generation + 1 > param.expandStartDesc ? 1 : orient), (generation + 1 > param.expandStartDesc ? 1 : 0), (startA > Math.PI ? 1 : Math.pow(2, generation + 2) / 2.0), false)
+			invert = startA >= Math.PI ? true : false
+			drawPersCell(indivData.marriages[m].children[c], inR + param.padding / 2, outR - param.padding / 2, startA, endA, generation + 1, (generation + 1 > param.expandStartDesc ? 1 : orient), (generation + 1 > param.expandStartDesc ? 1 : 0), invert, false)
 			drawDescendant(indivData.marriages[m].children[c], outR, startA, endA, generation + 2, orient, (generation > param.expandStartDesc ? 1 : 0));
 		}
 	}
@@ -128,7 +135,7 @@ function myarc(inR, outR, startA, endA, orient) {
 		return arcPath2 = "M" + u * s + "," + u * f + "A" + u + "," + u + " 0 " + greatCircle + ",0 " + u * h + "," + u * d + "L" + t * h + "," + t * d + "A" + t + "," + t + " 0 " + greatCircle + ",1 " + t * s + "," + t * f + "Z";
 }
 
-function drawPersCell(person, inR, outR, startA, endA, generation, orient, radialText, branch, isAsc) {
+function drawPersCell(person, inR, outR, startA, endA, generation, orient, radialText, invert, isAsc) {
 	if (!person)
 		return;
 	var lengthA = Math.abs(endA - startA);
@@ -223,18 +230,18 @@ function drawPersCell(person, inR, outR, startA, endA, generation, orient, radia
 		var lineThicknessCorrection = -9.0 / inR;
 		var lineThicknessCorrectionOneLine = -0.012;
 		if (generation < ( isAsc ? param.oneLineNameStart : param.oneLineNameStartDesc)) {
-			if (branch + 1 <= Math.pow(2, generation) / 2.0) {
+			if (invert) {
 				var x = (inR + 5) * Math.cos((endA + startA) / 2 - 0.005 - Math.PI / 2 + lineThicknessCorrection) + xShift;
 				var y = (inR + 5) * Math.sin((endA + startA) / 2 - 0.005 - Math.PI / 2 + lineThicknessCorrection) + yShift;
 
 				var xx = (inR + 5) * Math.cos((endA + startA) / 2 + 10.5 / inR - Math.PI / 2 + lineThicknessCorrection) + xShift;
 				var yy = (inR + 5) * Math.sin((endA + startA) / 2 + 10.5 / inR - Math.PI / 2 + lineThicknessCorrection) + yShift;
 
-				var xxx = outR * Math.cos(startA - Math.PI / 2 - 0.15 * lineThicknessCorrection) + xShift;
-				var yyy = outR * Math.sin(startA - Math.PI / 2 - 0.15 * lineThicknessCorrection) + yShift;
+				var xxx = outR * Math.cos(startA - Math.PI / 2) + xShift;
+				var yyy = outR * Math.sin(startA - Math.PI / 2) + yShift;
 
-				var xxxx = outR * Math.cos(endA - Math.PI / 2 + 0.5 * lineThicknessCorrection) + xShift;
-				var yyyy = outR * Math.sin(endA - Math.PI / 2 + 0.5 * lineThicknessCorrection) + yShift;
+				var xxxx = outR * Math.cos(endA - Math.PI / 2) + xShift;
+				var yyyy = outR * Math.sin(endA - Math.PI / 2) + yShift;
 
 				text.append("text")//
 				.style("font-size", param.nameFontSize + "px")//
@@ -251,22 +258,24 @@ function drawPersCell(person, inR, outR, startA, endA, generation, orient, radia
 				.text(person.fname.substring(0, Math.min(maxLetter + 4, person.fname.length + 1)));
 
 				if (param.displayAdditionalInfo) {
-					if (person.birth != null) {
+					if (isAsc?person.death:person.birth != null) {
 						text.append("text")//
 						.style("font-size", param.additionalInfoFontSize + "px")//
 						.style("text-anchor", "begin")//
 						.attr("dx", 2)//
+						.attr("dy", isAsc?-2:7)//
 						.attr("transform", "translate(" + xxxx + "," + yyyy + ") rotate(" + ((( orient ? 0 : 180) + (endA - Math.PI / 2) * 180 / Math.PI) + 180) + " 0 0)")//
-						.text(person.birth.date);
+						.text(isAsc?person.death.date:person.birth.date);
 					}
 
-					if (person.death != null) {
+					if (isAsc?person.birth:person.death != null) {
 						text.append("text")//
 						.style("font-size", param.additionalInfoFontSize + "px")//
 						.style("text-anchor", "begin")//
 						.attr("dx", 2)//
+						.attr("dy", isAsc?7:-2)
 						.attr("transform", "translate(" + xxx + "," + yyy + ") rotate(" + ((( orient ? 0 : 180) + (startA - Math.PI / 2) * 180 / Math.PI) + 180) + " 0 0)")//
-						.text(person.death.date);
+						.text(isAsc?person.birth.date:person.death.date);
 					}
 				}
 			} else {
@@ -276,11 +285,11 @@ function drawPersCell(person, inR, outR, startA, endA, generation, orient, radia
 				var xx = (inR + 5) * Math.cos((endA + startA) / 2 + 10.5 / inR - Math.PI / 2) + xShift;
 				var yy = (inR + 5) * Math.sin((endA + startA) / 2 + 10.5 / inR - Math.PI / 2) + yShift;
 
-				var xxx = outR * Math.cos(startA - Math.PI / 2 - 0.45 * lineThicknessCorrection) + xShift;
-				var yyy = outR * Math.sin(startA - Math.PI / 2 - 0.45 * lineThicknessCorrection) + yShift;
+				var xxx = outR * Math.cos(startA - Math.PI / 2) + xShift;
+				var yyy = outR * Math.sin(startA - Math.PI / 2) + yShift;
 
-				var xxxx = outR * Math.cos(endA - Math.PI / 2 + 0.15 * lineThicknessCorrection) + xShift;
-				var yyyy = outR * Math.sin(endA - Math.PI / 2 + 0.15 * lineThicknessCorrection) + yShift;
+				var xxxx = outR * Math.cos(endA - Math.PI / 2) + xShift;
+				var yyyy = outR * Math.sin(endA - Math.PI / 2) + yShift;
 
 				text.append("text")//
 				.style("font-size", param.nameFontSize + "px")//
@@ -295,29 +304,31 @@ function drawPersCell(person, inR, outR, startA, endA, generation, orient, radia
 				.text(person.fname.substring(0, Math.min(maxLetter + 4, person.fname.length + 1)));
 
 				if (param.displayAdditionalInfo) {
-					if (person.death != null) {
+					if (isAsc?person.birth:person.death != null) {
 						text.append("text")//
 						.style("font-size", param.additionalInfoFontSize + "px")//
 						.style("text-anchor", "end")//
 						.attr("dx", -2)//
+						.attr("dy", isAsc?7:-2)//
 						.attr("transform", "translate(" + xxxx + "," + yyyy + ") rotate(" + ((( orient ? 0 : 180) + (endA - Math.PI / 2) * 180 / Math.PI)) + " 0 0)")//
-						.text(person.death.date);
+						.text(isAsc?person.birth.date:person.death.date);
 					}
 
-					if (person.birth != null) {
+					if (isAsc?person.death:person.birth != null) {
 						text.append("text")//
 						.style("font-size", param.additionalInfoFontSize + "px")//
 						.style("text-anchor", "end")//
 						.attr("dx", -2)//
+						.attr("dy", isAsc?-2:7)//
 						.attr("transform", "translate(" + xxx + "," + yyy + ") rotate(" + ((( orient ? 0 : 180) + (startA - Math.PI / 2) * 180 / Math.PI)) + " 0 0)")//
-						.text(person.birth.date);
+						.text(isAsc?person.death.date:person.birth.date);
 					}
 				}
 			}
 
 		} else if (generation < param.stopDisplayName) {
 			var toWrite = person.name + " " + person.fname;
-			if (branch + 1 <= Math.pow(2, generation) / 2.0) {
+			if (invert) {
 				var x = (inR + 5) * Math.cos((endA + startA) / 2 + 0.005 - Math.PI / 2 + lineThicknessCorrectionOneLine) + xShift;
 				var y = (inR + 5) * Math.sin((endA + startA) / 2 + 0.005 - Math.PI / 2 + lineThicknessCorrectionOneLine) + yShift;
 
