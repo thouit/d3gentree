@@ -12,10 +12,10 @@ var vis = d3.select("#container").append("svg:svg")//create the SVG element insi
 draw_center(0);
 
 for (var i = 0; i < param.data.length; i++){
-	drawAscendants(param.data[i], 1, param.centerSize, -param.data[i].angleStart + Math.PI / 2.0, -param.data[i].angleStop + Math.PI / 2.0, 1);
+	drawAscendants(param.data[i], 1, param.general.centerSize, -param.data[i].angleStart + Math.PI / 2.0, -param.data[i].angleStop + Math.PI / 2.0, 1);
 }
 
-drawDescendant(param.data[param.descSourceNb].source.source, param.data[param.descSourceNb].sourceNb, param.centerSize, Math.PI + param.angleDesc / 2, Math.PI - param.angleDesc / 2, 0, 0);
+drawDescendant(param.data[param.desc.sourceNb].source.source, param.data[param.desc.sourceNb].sourceNb, param.general.centerSize, Math.PI + param.desc.angle / 2, Math.PI - param.desc.angle / 2, 0, 0);
 
 //setTimeout(encode_as_img_and_link, 1000);
 
@@ -38,9 +38,9 @@ function encode_as_img_and_link() {
 function compute_canvas_size(sourceNb){
 	global.r = 0;
 	if (param.data[sourceNb].source.ancestors.length < param.asc.expandStart) {
-		rMax = param.centerSize + param.radius * param.data[0].source.ancestors.length - param.padding / 2;
+		rMax = param.general.centerSize + param.general.radius * param.data[0].source.ancestors.length - param.general.padding / 2;
 	} else {
-		rMax = param.centerSize + param.radius * (param.asc.expandStart - 1) + param.radiusRadial * (param.data[sourceNb].source.ancestors.length - (param.asc.expandStart - 1)) - param.padding / 2;
+		rMax = param.general.centerSize + param.general.radius * (param.asc.expandStart - 1) + param.general.radiusRadial * (param.data[sourceNb].source.ancestors.length - (param.asc.expandStart - 1)) - param.general.padding / 2;
 	}
 	global.w = 2 * rMax + 50;
 	global.h = 2 * rMax + 50;
@@ -54,25 +54,25 @@ function draw_center(sourceNb){
 	.style("fill", "black");
 	
 	centerText.append("text")//
-	.style("font-size", param.nameFontSize + "px")//
+	.style("font-size", param.general.nameFontSize + "px")//
 	.style("font-weight", "bold")//
 	.attr("dy", -5).attr("text-anchor", "middle")//
-	.text(param.data[sourceNb].source.source.name.substring(0, Math.min((param.centerSize * 2 / 9) + 1, param.data[sourceNb].source.source.name.length + 1)));
+	.text(param.data[sourceNb].source.source.name.substring(0, Math.min((param.general.centerSize * 2 / 9) + 1, param.data[sourceNb].source.source.name.length + 1)));
 	
 	centerText.append("text")//
-	.attr("dy", 15).style("font-size", param.fnameFontSize + "px")//
+	.attr("dy", 15).style("font-size", param.general.fnameFontSize + "px")//
 	.attr("text-anchor", "middle")//
-	.text(param.data[sourceNb].source.source.fname.substring(0, Math.min((param.centerSize * 2 / 9) + 1, param.data[sourceNb].source.source.fname.length + 1)));
+	.text(param.data[sourceNb].source.source.fname.substring(0, Math.min((param.general.centerSize * 2 / 9) + 1, param.data[sourceNb].source.source.fname.length + 1)));
 }
 
 function drawAscendants(dataSource, sosa, inR_orig, startA_orig, endA_orig, orient) {
 	generation = parseInt(sosa).toString(2).length - 1;
 	branch = sosa - Math.pow(2, generation);
 	if (generation > param.asc.expandStart) {
-		var thisR = param.radiusRadial;
+		var thisR = param.general.radiusRadial;
 		var radialText = 1;
 	} else {
-		var thisR = param.radius;
+		var thisR = param.general.radius;
 		var radialText = 0;
 	}
 	var outR = inR_orig + thisR;
@@ -82,7 +82,7 @@ function drawAscendants(dataSource, sosa, inR_orig, startA_orig, endA_orig, orie
 		if (pers) {
 			dataSource.source.ancestors[generation - 1][branch].index = sosa;
 			invert = startA_orig <= 0 ? true : false
-			drawPersCell(pers, dataSource.sourceNb, inR_orig + param.padding / 2, outR - param.padding / 2, startA_orig, endA_orig, generation, orient, radialText, invert, true);
+			drawPersCell(pers, dataSource.sourceNb, inR_orig + param.general.padding / 2, outR - param.general.padding / 2, startA_orig, endA_orig, generation, orient, radialText, invert, true);
 		}
 	}
 	if (generation < dataSource.source.ancestors.length) {
@@ -97,11 +97,11 @@ function drawDescendant(indivData, sourceNb, inR_orig, startA_orig, endA_orig, g
 	if (!indivData.index)
 		indivData.index = "0";
 	var nbSpouse = indivData.marriages.length;
-	if (generation > param.desc.expandStart ? param.radiusRadial : param.radius) {
-		var thisR = param.radiusRadial;
+	if (generation > param.desc.expandStart ? param.general.radiusRadial : param.general.radius) {
+		var thisR = param.general.radiusRadial;
 		var radialText = 1;
 	} else {
-		var thisR = param.radius;
+		var thisR = param.general.radius;
 		var radialText = 0;
 	}
 	for (var m = 0; m < nbSpouse; ++m) {
@@ -109,20 +109,20 @@ function drawDescendant(indivData, sourceNb, inR_orig, startA_orig, endA_orig, g
 		var startA_s = startA_orig + m * lengthA;
 		var endA_s = startA_orig + (m + 1) * lengthA;
 		var inR = inR_orig;
-		var outR_s = inR + (generation > param.desc.expandStart ? param.radiusRadial : param.radius)*param.desc.spouseRadiusRatio;
+		var outR_s = inR + (generation > param.desc.expandStart ? param.general.radiusRadial : param.general.radius)*param.desc.spouseRadiusRatio;
 		indivData.marriages[m].spouse.index = indivData.index + "-" + m;
 		invert = startA_s > Math.PI ? true : false
-		drawPersCell(indivData.marriages[m].spouse, sourceNb, inR + param.padding / 2, outR_s - param.padding / 2, startA_s, endA_s, generation, (generation > param.desc.expandStart ? 1 : orient), (generation > param.desc.expandStart ? 1 : 0), invert, false)
+		drawPersCell(indivData.marriages[m].spouse, sourceNb, inR + param.general.padding / 2, outR_s - param.general.padding / 2, startA_s, endA_s, generation, (generation > param.desc.expandStart ? 1 : orient), (generation > param.desc.expandStart ? 1 : 0), invert, false)
 
 		for (var c = 0; c < indivData.marriages[m].children.length; ++c) {
 			lengthA_c = (endA_s - startA_s) / indivData.marriages[m].children.length;
 			var startA = startA_s + c * lengthA_c;
 			var endA = startA_s + (c + 1) * lengthA_c;
-			var inR = outR_s + param.descGenerationSpacing;
-			var outR = inR + (generation + 1 > param.desc.expandStart ? param.radiusRadial : param.radius);
+			var inR = outR_s + param.desc.generationSpacing;
+			var outR = inR + (generation + 1 > param.desc.expandStart ? param.general.radiusRadial : param.general.radius);
 			indivData.marriages[m].children[c].index = indivData.index + "-" + m + "." + c;
 			invert = startA > Math.PI ? true : false
-			drawPersCell(indivData.marriages[m].children[c], sourceNb, inR + param.padding / 2, outR - param.padding / 2, startA, endA, generation + 1, (generation + 1 > param.desc.expandStart ? 1 : orient), (generation + 1 > param.desc.expandStart ? 1 : 0), invert, false)
+			drawPersCell(indivData.marriages[m].children[c], sourceNb, inR + param.general.padding / 2, outR - param.general.padding / 2, startA, endA, generation + 1, (generation + 1 > param.desc.expandStart ? 1 : orient), (generation + 1 > param.desc.expandStart ? 1 : 0), invert, false)
 			drawDescendant(indivData.marriages[m].children[c], sourceNb, outR, startA, endA, generation + 2, orient, (generation > param.desc.expandStart ? 1 : 0));
 		}
 	}
@@ -152,9 +152,9 @@ function drawPersCell(person, sourceNb, inR, outR, startA, endA, generation, ori
 	var middleR = (outR + inR) / 2;
 
 	var xShift = 0;
-	//generation * param.padding * Math.cos((startA + endA) / 2 - Math.PI / 2);
+	//generation * param.general.padding * Math.cos((startA + endA) / 2 - Math.PI / 2);
 	var yShift = isAsc ? 0 : param.general.ascDescSpacing;
-	//generation * param.padding * Math.sin((startA + endA) / 2 - Math.PI / 2);
+	//generation * param.general.padding * Math.sin((startA + endA) / 2 - Math.PI / 2);
 
 	var elem = vis.append("svg:path")//
 	.attr("d", myarc(inR, outR, startA, endA, orient))//
@@ -164,13 +164,13 @@ function drawPersCell(person, sourceNb, inR, outR, startA, endA, generation, ori
 			if (person.gender == "H")
 				return d3.rgb(param.asc.colors[generation%param.asc.colors.length][0], param.asc.colors[generation%param.asc.colors.length][1], param.asc.colors[generation%param.asc.colors.length][2]);
 			else
-				return d3.rgb(Math.min(param.asc.colors[generation%param.asc.colors.length][0] * param.factor, 255), Math.min(param.asc.colors[generation%param.asc.colors.length][1] * param.factor, 255), Math.min(param.asc.colors[generation%param.asc.colors.length][2] * param.factor, 255));
+				return d3.rgb(Math.min(param.asc.colors[generation%param.asc.colors.length][0] * param.asc.spouseColorRatio, 255), Math.min(param.asc.colors[generation%param.asc.colors.length][1] * param.asc.spouseColorRatio, 255), Math.min(param.asc.colors[generation%param.asc.colors.length][2] * param.asc.spouseColorRatio, 255));
 		} else {
 			if (person.gender == "?")
 				return 'rgb(255,255,255)';
 			return d3.rgb(param.desc.colors[person.gender][generation % (param.desc.colors[person.gender].length)]);
 		}
-	}).style("stroke-width", param.padding * 2)//
+	}).style("stroke-width", param.general.padding * 2)//
 	.style("stroke", param.general.strokeColor)//
 	.attr("class", "arc " + generation + " branch")//
 	.attr("id", sourceNb + '_' + person.index);
@@ -181,17 +181,17 @@ function drawPersCell(person, sourceNb, inR, outR, startA, endA, generation, ori
 
 	if (!radialText) {
 		var spaceLength = lengthA * ( isAsc ? outR : inR);
-		var maxLetter = spaceLength * 2 / param.fnameFontSize - 3;
+		var maxLetter = spaceLength * 2 / param.general.fnameFontSize - 3;
 
 		var letterSpacingName = isAsc ? "1px" : "Opx"
 		var letterSpacingfName = isAsc ? "2px" : "-1px"
 
 		text.append("text")//
-		.style("font-size", param.nameFontSize + "px")//
+		.style("font-size", param.general.nameFontSize + "px")//
 		.style("font-weight", "bold")//
 		.style("letter-spacing", letterSpacingName)//
 		.attr("dx", spaceLength / (param.navigator ))//just half of the dx attribute is taken into account when text-anchor middle is used on firefox, works properly on chrome
-		.attr("dy", param.radius * 0.4)//
+		.attr("dy", param.general.radius * 0.4)//
 		.attr("method", "stretch")//
 		.attr("spacing", "auto")//
 		.append("textPath")//
@@ -200,11 +200,11 @@ function drawPersCell(person, sourceNb, inR, outR, startA, endA, generation, ori
 		.text(person.name.substring(0, Math.min(maxLetter + 1, person.name.length + 1)));
 
 		text.append("text")//
-		.style("font-size", param.fnameFontSize + "px")//
+		.style("font-size", param.general.fnameFontSize + "px")//
 		.style("font-weight", "300")//
 		.style("letter-spacing", letterSpacingfName)//
 		.attr("dx", spaceLength / param.navigator)//just half of the dx attribute is taken into account when text-anchor middle is used on firefox, works properly on chrome
-		.attr("dy", param.radius * 0.8)//
+		.attr("dy", param.general.radius * 0.8)//
 		.attr("method", "stretch")//
 		.attr("spacing", "auto")//
 		.append("textPath")//
@@ -212,12 +212,12 @@ function drawPersCell(person, sourceNb, inR, outR, startA, endA, generation, ori
 		.attr("text-anchor", "middle")//
 		.text(person.fname.substring(0, Math.min(maxLetter + 2, person.fname.length + 1)));
 
-		if (param.displayAdditionalInfo) {
+		if (param.general.displayAdditionalInfo) {
 			if (person.birth != null) {
 				text.append("text")//
 				.style("font-size", param.general.additionalInfoFontSize + "px")//
 				.attr("dx", 2)//
-				.attr("dy", param.radius * 0.12)//
+				.attr("dy", param.general.radius * 0.12)//
 				.attr("method", "stretch")//
 				.attr("spacing", "auto")//
 				.append("textPath")//
@@ -230,7 +230,7 @@ function drawPersCell(person, sourceNb, inR, outR, startA, endA, generation, ori
 				text.append("text")//
 				.style("font-size", param.general.additionalInfoFontSize + "px")//
 				.attr("dx", 2 * spaceLength / param.navigator - 2)//
-				.attr("dy", param.radius * 0.12)//
+				.attr("dy", param.general.radius * 0.12)//
 				.attr("method", "stretch")//
 				.attr("spacing", "auto")//
 				.append("textPath")//
@@ -240,7 +240,7 @@ function drawPersCell(person, sourceNb, inR, outR, startA, endA, generation, ori
 			}
 		}
 	} else {
-		var maxLetter = (outR - inR) * 1.5 / param.fnameFontSize;
+		var maxLetter = (outR - inR) * 1.5 / param.general.fnameFontSize;
 		var lineThicknessCorrection = -9.0 / inR;
 		var lineThicknessCorrectionOneLine = -0.012;
 		if (generation < ( isAsc ? param.asc.oneLineNameStart : param.desc.oneLineNameStart)) {
@@ -258,20 +258,20 @@ function drawPersCell(person, sourceNb, inR, outR, startA, endA, generation, ori
 				var yyyy = outR * Math.sin(endA - Math.PI / 2) + yShift;
 
 				text.append("text")//
-				.style("font-size", param.nameFontSize + "px")//
+				.style("font-size", param.general.nameFontSize + "px")//
 				.style("font-weight", "bold")//
 				.style("text-anchor", "end")//
 				.attr("transform", "translate(" + xx + "," + yy + ") rotate(" + ((( orient ? 0 : 180) + ((endA + startA) / 2 + 0.03 - Math.PI / 2) * 180 / Math.PI) + 180) + " 0 0)")//
 				.text(person.name.substring(0, Math.min(maxLetter + 1, person.name.length + 1)));
 
 				text.append("text")//
-				.style("font-size", param.fnameFontSize + "px")//
+				.style("font-size", param.general.fnameFontSize + "px")//
 				.style("font-weight", "300")//
 				.style("text-anchor", "end")//
 				.attr("transform", "translate(" + x + "," + y + ") rotate(" + ((( orient ? 0 : 180) + ((endA + startA) / 2 - 0.01 - Math.PI / 2) * 180 / Math.PI) + 180) + " 0 0)")//
 				.text(person.fname.substring(0, Math.min(maxLetter + 4, person.fname.length + 1)));
 
-				if (param.displayAdditionalInfo) {
+				if (param.general.displayAdditionalInfo) {
 					if (person.death != null) {
 						text.append("text")//
 						.style("font-size", param.general.additionalInfoFontSize + "px")//
@@ -305,18 +305,18 @@ function drawPersCell(person, sourceNb, inR, outR, startA, endA, generation, ori
 				var yyyy = outR * Math.sin(endA - Math.PI / 2) + yShift;
 
 				text.append("text")//
-				.style("font-size", param.nameFontSize + "px")//
+				.style("font-size", param.general.nameFontSize + "px")//
 				.style("font-weight", "bold")//
 				.attr("transform", "translate(" + x + "," + y + ") rotate(" + (( orient ? 0 : 180) + ((endA + startA) / 2 - 0.01 - Math.PI / 2) * 180 / Math.PI) + " 0 0)")//
 				.text(person.name.substring(0, Math.min(maxLetter + 1, person.name.length + 1)));
 
 				text.append("text")//
-				.style("font-size", param.fnameFontSize + "px")//
+				.style("font-size", param.general.fnameFontSize + "px")//
 				.style("font-weight", "300")//
 				.attr("transform", "translate(" + xx + "," + yy + ") rotate(" + (( orient ? 0 : 180) + ((endA + startA) / 2 + 0.03 - Math.PI / 2) * 180 / Math.PI) + " 0 0)")//
 				.text(person.fname.substring(0, Math.min(maxLetter + 4, person.fname.length + 1)));
 
-				if (param.displayAdditionalInfo) {
+				if (param.general.displayAdditionalInfo) {
 					if (person.birth != null) {
 						text.append("text")//
 						.style("font-size", param.general.additionalInfoFontSize + "px")//
@@ -339,14 +339,14 @@ function drawPersCell(person, sourceNb, inR, outR, startA, endA, generation, ori
 				}
 			}
 
-		} else if (generation < param.stopDisplayName) {
+		} else if (generation < param.general.stopDisplayName) {
 			var toWrite = person.name + " " + person.fname;
 			if (invert) {
 				var x = (inR + 5) * Math.cos((endA + startA) / 2 + 0.005 - Math.PI / 2 + lineThicknessCorrectionOneLine) + xShift;
 				var y = (inR + 5) * Math.sin((endA + startA) / 2 + 0.005 - Math.PI / 2 + lineThicknessCorrectionOneLine) + yShift;
 
 				text.append("text")//
-				.style("font-size", param.fnameFontSize + "px")//
+				.style("font-size", param.general.fnameFontSize + "px")//
 				.attr("transform", "translate(" + x + "," + y + ") rotate(" + ((( orient ? 0 : 180) + ((endA + startA) / 2 + 0.01 - Math.PI / 2) * 180 / Math.PI) + 180) + " 0 0)")//
 				.style("font-weight", "bold")//
 				.style("text-anchor", "end")//
@@ -358,7 +358,7 @@ function drawPersCell(person, sourceNb, inR, outR, startA, endA, generation, ori
 				var y = (inR + 5) * Math.sin((endA + startA) / 2 + 0.005 - Math.PI / 2) + yShift;
 
 				text.append("text")//
-				.style("font-size", param.fnameFontSize + "px")//
+				.style("font-size", param.general.fnameFontSize + "px")//
 				.attr("transform", "translate(" + x + "," + y + ") rotate(" + ((endA + startA) / 2 - 0.01 - Math.PI / 2) * 180 / (Math.PI) + " 0 0)")//
 				.style("font-weight", "bold")//
 				.text(person.name.substring(0, maxLetter + 4)).append("tspan")//
