@@ -1,28 +1,32 @@
 var param = {
-	//colors: [[207, 192, 255], [192, 211, 255], [192, 226, 255], [184, 255, 184], [231, 255, 184], [255, 243, 184], [255, 231, 184], [255, 216, 216], [255, 184, 184], [255, 184, 224], [231, 188, 255]],
-	//colors: [[245, 245, 255], [245, 255, 255], [255, 255, 245], [255, 245, 245], [255, 245, 255], [245, 255, 245]],
-	colors : [[250, 250, 250]],
-	colorsDesc : {"H":["rgb(250, 250, 255)","rgb(245, 245, 255)"], "F":["rgb(255, 250, 250)","rgb(255, 245, 245)"]}, // Color per gender and then {spouse, direct child}
-	//colorsDesc : [[245, 245, 250], [250, 245, 250]],
-	strokeColor : "#BBB",
-	expandStart : 2,
-	oneLineNameStart : 6,
-	oneLineNameStartDesc: 5,
-	stopDisplayName : 9,
-	radius : 55,
-	centerSize : 85,
-	radiusRadial : 145,
-	nameFontSize : 11,
-	fnameFontSize : 10,
-	additionalInfoFontSize: 6,
-	downOutsideDesc : 1, // should we write descendants counter-clockwise  ?
-	expandStartDesc : 0,
-	spouseRadiusRatio : 0.8,
+	general: {
+		strokeColor: "#BBB",
+		additionalInfoFontSize: 6, // font size for additionnal informations (date and place of birth and death for example)
+		ascDescSpacing : 5, //in pixels,
+	},
+	asc: {
+		colors: [[250, 250, 250]], // colors per generation
+		oneLineNameStart : 6, // When to use one line to display the name instead of two
+		expandStart : 2, // When to switch to radial view
+	},
+	desc: {
+		colors: {"H":["rgb(250, 250, 255)","rgb(245, 245, 255)"], "F":["rgb(255, 250, 250)","rgb(255, 245, 245)"]}, // Color per gender and then {spouse, direct child}
+		oneLineNameStart: 5, // When to use one line to display the name instead of two for the descendance
+		expandStart: 0, // when to switch to radial view for descendants
+	},
+	
+	stopDisplayName : 9, // when to stop to display any information
+	radius : 55, // radius of a normal cell
+	centerSize : 85, // center radius 
+	radiusRadial : 145, // radius of a radial cell
+	nameFontSize : 11,  // font size for the family name
+	fnameFontSize : 10, // font size for the first name
+	 
+	
 	angleDesc : 0.8 * Math.PI, // if <0 then take the remaining space
 	padding : 0.1,
 	navigator : 2, //2 for chrome, 1 for Firefox
 	factor : 1.05,
-	ascDescSpacing : 5, //in pixels,
 	descGenerationSpacing : 5, //in pixels
 	displayAdditionalInfo : true,
 	data: [

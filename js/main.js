@@ -37,10 +37,10 @@ function encode_as_img_and_link() {
 
 function compute_canvas_size(sourceNb){
 	global.r = 0;
-	if (param.data[sourceNb].source.ancestors.length < param.expandStart) {
+	if (param.data[sourceNb].source.ancestors.length < param.asc.expandStart) {
 		rMax = param.centerSize + param.radius * param.data[0].source.ancestors.length - param.padding / 2;
 	} else {
-		rMax = param.centerSize + param.radius * (param.expandStart - 1) + param.radiusRadial * (param.data[sourceNb].source.ancestors.length - (param.expandStart - 1)) - param.padding / 2;
+		rMax = param.centerSize + param.radius * (param.asc.expandStart - 1) + param.radiusRadial * (param.data[sourceNb].source.ancestors.length - (param.asc.expandStart - 1)) - param.padding / 2;
 	}
 	global.w = 2 * rMax + 50;
 	global.h = 2 * rMax + 50;
@@ -68,7 +68,7 @@ function draw_center(sourceNb){
 function drawAscendants(dataSource, sosa, inR_orig, startA_orig, endA_orig, orient) {
 	generation = parseInt(sosa).toString(2).length - 1;
 	branch = sosa - Math.pow(2, generation);
-	if (generation > param.expandStart) {
+	if (generation > param.asc.expandStart) {
 		var thisR = param.radiusRadial;
 		var radialText = 1;
 	} else {
@@ -97,7 +97,7 @@ function drawDescendant(indivData, sourceNb, inR_orig, startA_orig, endA_orig, g
 	if (!indivData.index)
 		indivData.index = "0";
 	var nbSpouse = indivData.marriages.length;
-	if (generation > param.expandStartDesc ? param.radiusRadial : param.radius) {
+	if (generation > param.desc.expandStart ? param.radiusRadial : param.radius) {
 		var thisR = param.radiusRadial;
 		var radialText = 1;
 	} else {
@@ -109,21 +109,21 @@ function drawDescendant(indivData, sourceNb, inR_orig, startA_orig, endA_orig, g
 		var startA_s = startA_orig + m * lengthA;
 		var endA_s = startA_orig + (m + 1) * lengthA;
 		var inR = inR_orig;
-		var outR_s = inR + (generation > param.expandStartDesc ? param.radiusRadial : param.radius);
+		var outR_s = inR + (generation > param.desc.expandStart ? param.radiusRadial : param.radius);
 		indivData.marriages[m].spouse.index = indivData.index + "-" + m;
 		invert = startA_s > Math.PI ? true : false
-		drawPersCell(indivData.marriages[m].spouse, sourceNb, inR + param.padding / 2, outR_s - param.padding / 2, startA_s, endA_s, generation, (generation > param.expandStartDesc ? 1 : orient), (generation > param.expandStartDesc ? 1 : 0), invert, false)
+		drawPersCell(indivData.marriages[m].spouse, sourceNb, inR + param.padding / 2, outR_s - param.padding / 2, startA_s, endA_s, generation, (generation > param.desc.expandStart ? 1 : orient), (generation > param.desc.expandStart ? 1 : 0), invert, false)
 
 		for (var c = 0; c < indivData.marriages[m].children.length; ++c) {
 			lengthA_c = (endA_s - startA_s) / indivData.marriages[m].children.length;
 			var startA = startA_s + c * lengthA_c;
 			var endA = startA_s + (c + 1) * lengthA_c;
 			var inR = outR_s + param.descGenerationSpacing;
-			var outR = inR + (generation + 1 > param.expandStartDesc ? param.radiusRadial : param.radius);
+			var outR = inR + (generation + 1 > param.desc.expandStart ? param.radiusRadial : param.radius);
 			indivData.marriages[m].children[c].index = indivData.index + "-" + m + "." + c;
 			invert = startA > Math.PI ? true : false
-			drawPersCell(indivData.marriages[m].children[c], sourceNb, inR + param.padding / 2, outR - param.padding / 2, startA, endA, generation + 1, (generation + 1 > param.expandStartDesc ? 1 : orient), (generation + 1 > param.expandStartDesc ? 1 : 0), invert, false)
-			drawDescendant(indivData.marriages[m].children[c], sourceNb, outR, startA, endA, generation + 2, orient, (generation > param.expandStartDesc ? 1 : 0));
+			drawPersCell(indivData.marriages[m].children[c], sourceNb, inR + param.padding / 2, outR - param.padding / 2, startA, endA, generation + 1, (generation + 1 > param.desc.expandStart ? 1 : orient), (generation + 1 > param.desc.expandStart ? 1 : 0), invert, false)
+			drawDescendant(indivData.marriages[m].children[c], sourceNb, outR, startA, endA, generation + 2, orient, (generation > param.desc.expandStart ? 1 : 0));
 		}
 	}
 }
@@ -153,7 +153,7 @@ function drawPersCell(person, sourceNb, inR, outR, startA, endA, generation, ori
 
 	var xShift = 0;
 	//generation * param.padding * Math.cos((startA + endA) / 2 - Math.PI / 2);
-	var yShift = isAsc ? 0 : param.ascDescSpacing;
+	var yShift = isAsc ? 0 : param.general.ascDescSpacing;
 	//generation * param.padding * Math.sin((startA + endA) / 2 - Math.PI / 2);
 
 	var elem = vis.append("svg:path")//
@@ -162,16 +162,16 @@ function drawPersCell(person, sourceNb, inR, outR, startA, endA, generation, ori
 	.attr("fill", function() {
 		if (isAsc) {
 			if (person.gender == "H")
-				return d3.rgb(param.colors[generation%param.colors.length][0], param.colors[generation%param.colors.length][1], param.colors[generation%param.colors.length][2]);
+				return d3.rgb(param.asc.colors[generation%param.asc.colors.length][0], param.asc.colors[generation%param.asc.colors.length][1], param.asc.colors[generation%param.asc.colors.length][2]);
 			else
-				return d3.rgb(Math.min(param.colors[generation%param.colors.length][0] * param.factor, 255), Math.min(param.colors[generation%param.colors.length][1] * param.factor, 255), Math.min(param.colors[generation%param.colors.length][2] * param.factor, 255));
+				return d3.rgb(Math.min(param.asc.colors[generation%param.asc.colors.length][0] * param.factor, 255), Math.min(param.asc.colors[generation%param.asc.colors.length][1] * param.factor, 255), Math.min(param.asc.colors[generation%param.asc.colors.length][2] * param.factor, 255));
 		} else {
 			if (person.gender == "?")
 				return 'rgb(255,255,255)';
-			return d3.rgb(param.colorsDesc[person.gender][generation % (param.colorsDesc[person.gender].length)]);
+			return d3.rgb(param.desc.colors[person.gender][generation % (param.desc.colors[person.gender].length)]);
 		}
 	}).style("stroke-width", param.padding * 2)//
-	.style("stroke", param.strokeColor)//
+	.style("stroke", param.general.strokeColor)//
 	.attr("class", "arc " + generation + " branch")//
 	.attr("id", sourceNb + '_' + person.index);
 	//
@@ -215,7 +215,7 @@ function drawPersCell(person, sourceNb, inR, outR, startA, endA, generation, ori
 		if (param.displayAdditionalInfo) {
 			if (person.birth != null) {
 				text.append("text")//
-				.style("font-size", param.additionalInfoFontSize + "px")//
+				.style("font-size", param.general.additionalInfoFontSize + "px")//
 				.attr("dx", 2)//
 				.attr("dy", param.radius * 0.12)//
 				.attr("method", "stretch")//
@@ -228,7 +228,7 @@ function drawPersCell(person, sourceNb, inR, outR, startA, endA, generation, ori
 
 			if (person.death != null) {
 				text.append("text")//
-				.style("font-size", param.additionalInfoFontSize + "px")//
+				.style("font-size", param.general.additionalInfoFontSize + "px")//
 				.attr("dx", 2 * spaceLength / param.navigator - 2)//
 				.attr("dy", param.radius * 0.12)//
 				.attr("method", "stretch")//
@@ -243,7 +243,7 @@ function drawPersCell(person, sourceNb, inR, outR, startA, endA, generation, ori
 		var maxLetter = (outR - inR) * 1.5 / param.fnameFontSize;
 		var lineThicknessCorrection = -9.0 / inR;
 		var lineThicknessCorrectionOneLine = -0.012;
-		if (generation < ( isAsc ? param.oneLineNameStart : param.oneLineNameStartDesc)) {
+		if (generation < ( isAsc ? param.asc.oneLineNameStart : param.desc.oneLineNameStart)) {
 			if (invert) {
 				var x = (inR + 5) * Math.cos((endA + startA) / 2 - 0.005 - Math.PI / 2 + lineThicknessCorrection) + xShift;
 				var y = (inR + 5) * Math.sin((endA + startA) / 2 - 0.005 - Math.PI / 2 + lineThicknessCorrection) + yShift;
@@ -274,7 +274,7 @@ function drawPersCell(person, sourceNb, inR, outR, startA, endA, generation, ori
 				if (param.displayAdditionalInfo) {
 					if (person.death != null) {
 						text.append("text")//
-						.style("font-size", param.additionalInfoFontSize + "px")//
+						.style("font-size", param.general.additionalInfoFontSize + "px")//
 						.style("text-anchor", "begin")//
 						.attr("dx", 2)//
 						.attr("dy", -2)//
@@ -284,7 +284,7 @@ function drawPersCell(person, sourceNb, inR, outR, startA, endA, generation, ori
 
 					if (person.birth != null) {
 						text.append("text")//
-						.style("font-size", param.additionalInfoFontSize + "px")//
+						.style("font-size", param.general.additionalInfoFontSize + "px")//
 						.style("text-anchor", "begin")//
 						.attr("dx", 2)//
 						.attr("dy", 7).attr("transform", "translate(" + xxx + "," + yyy + ") rotate(" + ((( orient ? 0 : 180) + (startA - Math.PI / 2) * 180 / Math.PI) + 180) + " 0 0)")//
@@ -319,7 +319,7 @@ function drawPersCell(person, sourceNb, inR, outR, startA, endA, generation, ori
 				if (param.displayAdditionalInfo) {
 					if (person.birth != null) {
 						text.append("text")//
-						.style("font-size", param.additionalInfoFontSize + "px")//
+						.style("font-size", param.general.additionalInfoFontSize + "px")//
 						.style("text-anchor", "end")//
 						.attr("dx", -2)//
 						.attr("dy", 7)//
@@ -329,7 +329,7 @@ function drawPersCell(person, sourceNb, inR, outR, startA, endA, generation, ori
 
 					if (person.death != null) {
 						text.append("text")//
-						.style("font-size", param.additionalInfoFontSize + "px")//
+						.style("font-size", param.general.additionalInfoFontSize + "px")//
 						.style("text-anchor", "end")//
 						.attr("dx", -2)//
 						.attr("dy", -2)//
