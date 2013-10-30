@@ -1,5 +1,24 @@
 var global = {}
 
+compute_canvas_size(0);
+
+var vis = d3.select("#container").append("svg:svg")//create the SVG element inside the <body>
+.attr("width", global.w)//set the width and height of our visualization (these will be attributes of the <svg> tag
+.attr("height", global.h)//
+.attr("id", "svg")//
+.append("svg:g")//make a group to hold our pie chart
+.attr("transform", "translate(" + global.w / 2 + "," + global.h / 2 + ")")//move the center of the pie chart from 0, 0 to center or drawing area
+
+draw_center(0);
+
+for (var i = 0; i < param.data.length; i++){
+	drawAscendants(param.data[i], 1, param.centerSize, -param.data[i].angleStart + Math.PI / 2.0, -param.data[i].angleStop + Math.PI / 2.0, 1);
+}
+
+drawDescendant(param.data[param.descSourceNb].source.source, param.data[param.descSourceNb].sourceNb, param.centerSize, Math.PI + param.angleDesc / 2, Math.PI - param.angleDesc / 2, 0, 0);
+
+//setTimeout(encode_as_img_and_link, 1000);
+
 function encode_as_img_and_link() {
 	// Add some critical information
 	svg = $("svg").attr({
@@ -16,32 +35,19 @@ function encode_as_img_and_link() {
 	$("body").append($("<div class='download'><a href-lang='image/svg+xml' href='data:image/svg+xml;base64,\n" + b64 + "' title='file.svg' download='file.svg'>Download as svg</a></div>"));
 }
 
-//setTimeout(encode_as_img_and_link, 1000);
-
-compute_canvas_size();
-
-var vis = d3.select("#container").append("svg:svg")//create the SVG element inside the <body>
-.attr("width", global.w)//set the width and height of our visualization (these will be attributes of the <svg> tag
-.attr("height", global.h)//
-.attr("id", "svg")//
-.append("svg:g")//make a group to hold our pie chart
-.attr("transform", "translate(" + global.w / 2 + "," + global.h / 2 + ")")//move the center of the pie chart from 0, 0 to center or drawing area
-
-draw_center();
-
-// Draw center element
-function compute_canvas_size(){
+function compute_canvas_size(sourceNb){
 	global.r = 0;
-	if (param.data[0].source.ancestors.length < param.expandStart) {
+	if (param.data[sourceNb].source.ancestors.length < param.expandStart) {
 		rMax = param.centerSize + param.radius * param.data[0].source.ancestors.length - param.padding / 2;
 	} else {
-		rMax = param.centerSize + param.radius * (param.expandStart - 1) + param.radiusRadial * (param.data[0].source.ancestors.length - (param.expandStart - 1)) - param.padding / 2;
+		rMax = param.centerSize + param.radius * (param.expandStart - 1) + param.radiusRadial * (param.data[sourceNb].source.ancestors.length - (param.expandStart - 1)) - param.padding / 2;
 	}
 	global.w = 2 * rMax + 50;
 	global.h = 2 * rMax + 50;
 }
 
-function draw_center(){
+// Draw center element
+function draw_center(sourceNb){
 	//add center text
 	var centerText = vis.append("g")//
 	.attr("class", "text")//
@@ -51,18 +57,13 @@ function draw_center(){
 	.style("font-size", param.nameFontSize + "px")//
 	.style("font-weight", "bold")//
 	.attr("dy", -5).attr("text-anchor", "middle")//
-	.text(param.data[0].source.source.name.substring(0, Math.min((param.centerSize * 2 / 9) + 1, param.data[0].source.source.name.length + 1)));
+	.text(param.data[sourceNb].source.source.name.substring(0, Math.min((param.centerSize * 2 / 9) + 1, param.data[sourceNb].source.source.name.length + 1)));
 	
 	centerText.append("text")//
 	.attr("dy", 15).style("font-size", param.fnameFontSize + "px")//
 	.attr("text-anchor", "middle")//
-	.text(param.data[0].source.source.fname.substring(0, Math.min((param.centerSize * 2 / 9) + 1, param.data[0].source.source.fname.length + 1)));
+	.text(param.data[sourceNb].source.source.fname.substring(0, Math.min((param.centerSize * 2 / 9) + 1, param.data[sourceNb].source.source.fname.length + 1)));
 }
-
-drawAscendants(param.data[0], 1, param.centerSize, -param.data[0].angleStart + Math.PI / 2.0, -param.data[0].angleStop + Math.PI / 2.0, 1);
-drawAscendants(param.data[1], 1, param.centerSize, -param.data[1].angleStart + Math.PI / 2.0, -param.data[1].angleStop + Math.PI / 2.0, 1);
-drawAscendants(param.data[2], 1, param.centerSize, -param.data[2].angleStart + Math.PI / 2.0, -param.data[2].angleStop + Math.PI / 2.0, 1);
-drawDescendant(param.data[0].source.source, param.data[0].sourceNb, param.centerSize, Math.PI + param.angleDesc / 2, Math.PI - param.angleDesc / 2, 0, 0);
 
 function drawAscendants(dataSource, sosa, inR_orig, startA_orig, endA_orig, orient) {
 	generation = parseInt(sosa).toString(2).length - 1;

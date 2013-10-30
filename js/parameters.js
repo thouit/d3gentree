@@ -30,4 +30,5 @@ var param = {
 		{source: data2, angleStart: 0.3*Math.PI, angleStop: 0.7*Math.PI, sourceNb: "1"},
 		{source: data3, angleStart: 0.7*Math.PI, angleStop: Math.PI*1.1, sourceNb: "2"},
 	],
+	descSourceNb: 0,
 }; 
