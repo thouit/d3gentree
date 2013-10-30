@@ -109,7 +109,7 @@ function drawDescendant(indivData, sourceNb, inR_orig, startA_orig, endA_orig, g
 		var startA_s = startA_orig + m * lengthA;
 		var endA_s = startA_orig + (m + 1) * lengthA;
 		var inR = inR_orig;
-		var outR_s = inR + (generation > param.desc.expandStart ? param.radiusRadial : param.radius);
+		var outR_s = inR + (generation > param.desc.expandStart ? param.radiusRadial : param.radius)*param.desc.spouseRadiusRatio;
 		indivData.marriages[m].spouse.index = indivData.index + "-" + m;
 		invert = startA_s > Math.PI ? true : false
 		drawPersCell(indivData.marriages[m].spouse, sourceNb, inR + param.padding / 2, outR_s - param.padding / 2, startA_s, endA_s, generation, (generation > param.desc.expandStart ? 1 : orient), (generation > param.desc.expandStart ? 1 : 0), invert, false)
