@@ -1,3 +1,5 @@
+var global = {}
+
 function encode_as_img_and_link() {
 	// Add some critical information
 	svg = $("svg").attr({
@@ -16,50 +18,51 @@ function encode_as_img_and_link() {
 
 //setTimeout(encode_as_img_and_link, 1000);
 
-var r = 0;
-if (data.ancestors.length < param.expandStart) {
-	rMax = param.centerSize + param.radius * data.ancestors.length - param.padding / 2;
-} else {
-	rMax = param.centerSize + param.radius * (param.expandStart - 1) + param.radiusRadial * (data.ancestors.length - (param.expandStart - 1)) - param.padding / 2;
-}
-var w = 2 * rMax + 50, //param.width, //width
-h = 2 * rMax + 50;
-//param.height;
+compute_canvas_size();
 
 var vis = d3.select("#container").append("svg:svg")//create the SVG element inside the <body>
-.attr("width", w)//set the width and height of our visualization (these will be attributes of the <svg> tag
-.attr("height", h)//
+.attr("width", global.w)//set the width and height of our visualization (these will be attributes of the <svg> tag
+.attr("height", global.h)//
 .attr("id", "svg")//
 .append("svg:g")//make a group to hold our pie chart
-.attr("transform", "translate(" + w / 2 + "," + h / 2 + ")")//move the center of the pie chart from 0, 0 to center or drawing area
+.attr("transform", "translate(" + global.w / 2 + "," + global.h / 2 + ")")//move the center of the pie chart from 0, 0 to center or drawing area
 
-//add center text
-var centerText = vis.append("g")//
-.attr("class", "text")//
-.style("fill", "black");
+draw_center();
 
-centerText.append("text")//
-.style("font-size", param.nameFontSize + "px")//
-.style("font-weight", "bold")//
-.attr("dy", -5).attr("text-anchor", "middle")//
-.text(data.source.name.substring(0, Math.min((param.centerSize * 2 / 9) + 1, data.source.name.length + 1)));
-centerText.append("text")//
-.attr("dy", 15).style("font-size", param.fnameFontSize + "px")//
-.attr("text-anchor", "middle")//
-.text(data.source.fname.substring(0, Math.min((param.centerSize * 2 / 9) + 1, data.source.fname.length + 1)));
-
-if (param.angleStart != undefined && param.angleStop != undefined){
-	drawAscendants(data, 1, param.centerSize,  -param.angleStart + Math.PI/2.0, - param.angleStop + Math.PI/2.0, 1);
-	/*if (param.angleStart2 != undefined && param.angleStop2 != undefined){
-		drawAscendants(data2, 1, param.centerSize,  -param.angleStart2 + Math.PI/2.0, - param.angleStop2 + Math.PI/2.0, 1);
-	}*/
-} else { 
-	drawAscendants(data, 1, param.centerSize, param.angle / 2, -param.angle / 2, 1);
+// Draw center element
+function compute_canvas_size(){
+	global.r = 0;
+	if (param.data[0].source.ancestors.length < param.expandStart) {
+		rMax = param.centerSize + param.radius * param.data[0].source.ancestors.length - param.padding / 2;
+	} else {
+		rMax = param.centerSize + param.radius * (param.expandStart - 1) + param.radiusRadial * (param.data[0].source.ancestors.length - (param.expandStart - 1)) - param.padding / 2;
+	}
+	global.w = 2 * rMax + 50;
+	global.h = 2 * rMax + 50;
 }
 
+function draw_center(){
+	//add center text
+	var centerText = vis.append("g")//
+	.attr("class", "text")//
+	.style("fill", "black");
+	
+	centerText.append("text")//
+	.style("font-size", param.nameFontSize + "px")//
+	.style("font-weight", "bold")//
+	.attr("dy", -5).attr("text-anchor", "middle")//
+	.text(param.data[0].source.source.name.substring(0, Math.min((param.centerSize * 2 / 9) + 1, param.data[0].source.source.name.length + 1)));
+	
+	centerText.append("text")//
+	.attr("dy", 15).style("font-size", param.fnameFontSize + "px")//
+	.attr("text-anchor", "middle")//
+	.text(param.data[0].source.source.fname.substring(0, Math.min((param.centerSize * 2 / 9) + 1, param.data[0].source.source.fname.length + 1)));
+}
 
-
-drawDescendant(data.source, param.centerSize, Math.PI + param.angleDesc / 2, Math.PI - param.angleDesc / 2, 0, 0);
+drawAscendants(param.data[0], 1, param.centerSize, -param.data[0].angleStart + Math.PI / 2.0, -param.data[0].angleStop + Math.PI / 2.0, 1);
+drawAscendants(param.data[1], 1, param.centerSize, -param.data[1].angleStart + Math.PI / 2.0, -param.data[1].angleStop + Math.PI / 2.0, 1);
+drawAscendants(param.data[2], 1, param.centerSize, -param.data[2].angleStart + Math.PI / 2.0, -param.data[2].angleStop + Math.PI / 2.0, 1);
+drawDescendant(param.data[0].source.source, param.data[0].sourceNb, param.centerSize, Math.PI + param.angleDesc / 2, Math.PI - param.angleDesc / 2, 0, 0);
 
 function drawAscendants(dataSource, sosa, inR_orig, startA_orig, endA_orig, orient) {
 	generation = parseInt(sosa).toString(2).length - 1;
@@ -73,22 +76,22 @@ function drawAscendants(dataSource, sosa, inR_orig, startA_orig, endA_orig, orie
 	}
 	var outR = inR_orig + thisR;
 	pers = undefined;
-	if (generation > 0 && dataSource.ancestors[generation - 1]) {
-		pers = dataSource.ancestors[generation-1][branch];
+	if (generation > 0 && dataSource.source.ancestors[generation - 1]) {
+		pers = dataSource.source.ancestors[generation-1][branch];
 		if (pers) {
-			dataSource.ancestors[generation - 1][branch].index = sosa;
+			dataSource.source.ancestors[generation - 1][branch].index = sosa;
 			invert = startA_orig <= 0 ? true : false
-			drawPersCell(pers, inR_orig + param.padding / 2, outR - param.padding / 2, startA_orig, endA_orig, generation, orient, radialText, invert, true);
+			drawPersCell(pers, dataSource.sourceNb, inR_orig + param.padding / 2, outR - param.padding / 2, startA_orig, endA_orig, generation, orient, radialText, invert, true);
 		}
 	}
-	if (generation < dataSource.ancestors.length) {
+	if (generation < dataSource.source.ancestors.length) {
 		var midA = (startA_orig + endA_orig) / 2;
 		drawAscendants(dataSource, 2 * sosa, outR, startA_orig, midA, orient);
 		drawAscendants(dataSource, 2 * sosa + 1, outR, midA, endA_orig, orient);
 	}
 }
 
-function drawDescendant(indivData, inR_orig, startA_orig, endA_orig, generation, orient) {
+function drawDescendant(indivData, sourceNb, inR_orig, startA_orig, endA_orig, generation, orient) {
 	// Divide arc per marriages
 	if (!indivData.index)
 		indivData.index = "0";
@@ -108,7 +111,7 @@ function drawDescendant(indivData, inR_orig, startA_orig, endA_orig, generation,
 		var outR_s = inR + (generation > param.expandStartDesc ? param.radiusRadial : param.radius);
 		indivData.marriages[m].spouse.index = indivData.index + "-" + m;
 		invert = startA_s > Math.PI ? true : false
-		drawPersCell(indivData.marriages[m].spouse, inR + param.padding / 2, outR_s - param.padding / 2, startA_s, endA_s, generation, (generation > param.expandStartDesc ? 1 : orient), (generation > param.expandStartDesc ? 1 : 0), invert, false)
+		drawPersCell(indivData.marriages[m].spouse, sourceNb, inR + param.padding / 2, outR_s - param.padding / 2, startA_s, endA_s, generation, (generation > param.expandStartDesc ? 1 : orient), (generation > param.expandStartDesc ? 1 : 0), invert, false)
 
 		for (var c = 0; c < indivData.marriages[m].children.length; ++c) {
 			lengthA_c = (endA_s - startA_s) / indivData.marriages[m].children.length;
@@ -118,8 +121,8 @@ function drawDescendant(indivData, inR_orig, startA_orig, endA_orig, generation,
 			var outR = inR + (generation + 1 > param.expandStartDesc ? param.radiusRadial : param.radius);
 			indivData.marriages[m].children[c].index = indivData.index + "-" + m + "." + c;
 			invert = startA > Math.PI ? true : false
-			drawPersCell(indivData.marriages[m].children[c], inR + param.padding / 2, outR - param.padding / 2, startA, endA, generation + 1, (generation + 1 > param.expandStartDesc ? 1 : orient), (generation + 1 > param.expandStartDesc ? 1 : 0), invert, false)
-			drawDescendant(indivData.marriages[m].children[c], outR, startA, endA, generation + 2, orient, (generation > param.expandStartDesc ? 1 : 0));
+			drawPersCell(indivData.marriages[m].children[c], sourceNb, inR + param.padding / 2, outR - param.padding / 2, startA, endA, generation + 1, (generation + 1 > param.expandStartDesc ? 1 : orient), (generation + 1 > param.expandStartDesc ? 1 : 0), invert, false)
+			drawDescendant(indivData.marriages[m].children[c], sourceNb, outR, startA, endA, generation + 2, orient, (generation > param.expandStartDesc ? 1 : 0));
 		}
 	}
 }
@@ -141,7 +144,7 @@ function myarc(inR, outR, startA, endA, orient) {
 		return arcPath2 = "M" + u * s + "," + u * f + "A" + u + "," + u + " 0 " + greatCircle + ",0 " + u * h + "," + u * d + "L" + t * h + "," + t * d + "A" + t + "," + t + " 0 " + greatCircle + ",1 " + t * s + "," + t * f + "Z";
 }
 
-function drawPersCell(person, inR, outR, startA, endA, generation, orient, radialText, invert, isAsc) {
+function drawPersCell(person, sourceNb, inR, outR, startA, endA, generation, orient, radialText, invert, isAsc) {
 	if (!person)
 		return;
 	var lengthA = Math.abs(endA - startA);
@@ -156,19 +159,21 @@ function drawPersCell(person, inR, outR, startA, endA, generation, orient, radia
 	.attr("d", myarc(inR, outR, startA, endA, orient))//
 	.attr("transform", "translate(" + xShift + "," + yShift + ")")//
 	.attr("fill", function() {
-		if (isAsc){
-			if (person.gender == "H") 
+		if (isAsc) {
+			if (person.gender == "H")
 				return d3.rgb(param.colors[generation%param.colors.length][0], param.colors[generation%param.colors.length][1], param.colors[generation%param.colors.length][2]);
 			else
 				return d3.rgb(Math.min(param.colors[generation%param.colors.length][0] * param.factor, 255), Math.min(param.colors[generation%param.colors.length][1] * param.factor, 255), Math.min(param.colors[generation%param.colors.length][2] * param.factor, 255));
 		} else {
-		    if (person.gender=="?") return 'rgb(255,255,255)';
-		    return d3.rgb(param.colorsDesc[person.gender][generation%(param.colorsDesc[person.gender].length)]);
+			if (person.gender == "?")
+				return 'rgb(255,255,255)';
+			return d3.rgb(param.colorsDesc[person.gender][generation % (param.colorsDesc[person.gender].length)]);
 		}
 	}).style("stroke-width", param.padding * 2)//
 	.style("stroke", param.strokeColor)//
 	.attr("class", "arc " + generation + " branch")//
-	.attr("id", person.index);//
+	.attr("id", sourceNb + '_' + person.index);
+	//
 
 	var text = vis.append("g")//
 	.attr("class", "text");
@@ -189,7 +194,7 @@ function drawPersCell(person, inR, outR, startA, endA, generation, orient, radia
 		.attr("method", "stretch")//
 		.attr("spacing", "auto")//
 		.append("textPath")//
-		.attr("xlink:href", "#" + person.index)//
+		.attr("xlink:href", "#" + sourceNb + '_' + person.index)//
 		.attr("text-anchor", "middle")//
 		.text(person.name.substring(0, Math.min(maxLetter + 1, person.name.length + 1)));
 
@@ -202,7 +207,7 @@ function drawPersCell(person, inR, outR, startA, endA, generation, orient, radia
 		.attr("method", "stretch")//
 		.attr("spacing", "auto")//
 		.append("textPath")//
-		.attr("xlink:href", "#" + person.index)//
+		.attr("xlink:href", "#" + sourceNb + '_' + person.index)//
 		.attr("text-anchor", "middle")//
 		.text(person.fname.substring(0, Math.min(maxLetter + 2, person.fname.length + 1)));
 
@@ -215,7 +220,7 @@ function drawPersCell(person, inR, outR, startA, endA, generation, orient, radia
 				.attr("method", "stretch")//
 				.attr("spacing", "auto")//
 				.append("textPath")//
-				.attr("xlink:href", "#" + person.index)//
+				.attr("xlink:href", "#" + sourceNb + '_' + person.index)//
 				.attr("text-anchor", "begin")//
 				.text(person.birth.date);
 			}
@@ -228,7 +233,7 @@ function drawPersCell(person, inR, outR, startA, endA, generation, orient, radia
 				.attr("method", "stretch")//
 				.attr("spacing", "auto")//
 				.append("textPath")//
-				.attr("xlink:href", "#" + person.index)//
+				.attr("xlink:href", "#" + sourceNb + '-' + person.index)//
 				.attr("text-anchor", "end")//
 				.text(person.death.date);
 			}
@@ -281,8 +286,7 @@ function drawPersCell(person, inR, outR, startA, endA, generation, orient, radia
 						.style("font-size", param.additionalInfoFontSize + "px")//
 						.style("text-anchor", "begin")//
 						.attr("dx", 2)//
-						.attr("dy", 7)
-						.attr("transform", "translate(" + xxx + "," + yyy + ") rotate(" + ((( orient ? 0 : 180) + (startA - Math.PI / 2) * 180 / Math.PI) + 180) + " 0 0)")//
+						.attr("dy", 7).attr("transform", "translate(" + xxx + "," + yyy + ") rotate(" + ((( orient ? 0 : 180) + (startA - Math.PI / 2) * 180 / Math.PI) + 180) + " 0 0)")//
 						.text(person.birth.date);
 					}
 				}
@@ -345,10 +349,9 @@ function drawPersCell(person, inR, outR, startA, endA, generation, orient, radia
 				.attr("transform", "translate(" + x + "," + y + ") rotate(" + ((( orient ? 0 : 180) + ((endA + startA) / 2 + 0.01 - Math.PI / 2) * 180 / Math.PI) + 180) + " 0 0)")//
 				.style("font-weight", "bold")//
 				.style("text-anchor", "end")//
-				.text(person.name.substring(0,maxLetter + 4))
-				.append("tspan")//
+				.text(person.name.substring(0, maxLetter + 4)).append("tspan")//
 				.style("font-weight", "300")//
-				.text(" "+person.fname.substring(0,maxLetter + 4-(person.name.length +1)))
+				.text(" " + person.fname.substring(0, maxLetter + 4 - (person.name.length + 1)))
 			} else {
 				var x = (inR + 5) * Math.cos((endA + startA) / 2 + 0.005 - Math.PI / 2) + xShift;
 				var y = (inR + 5) * Math.sin((endA + startA) / 2 + 0.005 - Math.PI / 2) + yShift;
@@ -357,11 +360,9 @@ function drawPersCell(person, inR, outR, startA, endA, generation, orient, radia
 				.style("font-size", param.fnameFontSize + "px")//
 				.attr("transform", "translate(" + x + "," + y + ") rotate(" + ((endA + startA) / 2 - 0.01 - Math.PI / 2) * 180 / (Math.PI) + " 0 0)")//
 				.style("font-weight", "bold")//
-				.text(person.name.substring(0,maxLetter + 4))
-				.append("tspan")//
+				.text(person.name.substring(0, maxLetter + 4)).append("tspan")//
 				.style("font-weight", "300")//
-				.text(" "+person.fname.substring(0,maxLetter + 4-(person.name.length +1)))
-				.text(toWrite.substring(0, Math.min(maxLetter + 4, toWrite.length + 1)));
+				.text(" " + person.fname.substring(0, maxLetter + 4 - (person.name.length + 1))).text(toWrite.substring(0, Math.min(maxLetter + 4, toWrite.length + 1)));
 			}
 		}
 	}
@@ -396,13 +397,13 @@ $(".arc").hover(function() {
 	$("#details").css("display", "none");
 });
 
-function getPersDataFromId(persId) {
+function getPersDataFromId(persId, sourceNb) {
 	if (!persId)
 		return;
 	if (persId.length < 2 || persId[1] != "-") {
 		generation = parseInt(persId).toString(2).length - 1;
 		branch = parseInt(persId) - Math.pow(2, generation);
-		return data.ancestors[generation - 1][branch];
+		return param.data[sourceNb].source.ancestors[generation - 1][branch];
 	} else {
 		function recAddress(obj, path) {
 			p = path.match(/(?:-(\d+)(?:\.(\d+))?)?(.*)/);
@@ -413,19 +414,22 @@ function getPersDataFromId(persId) {
 			return obj;
 		}
 
-		return recAddress(data.source, persId.slice(1));
+		return recAddress(param.data[sourceNb].source.source, persId.slice(1));
 	}
 }
 
 function writeDetails(dom, fromsvg) {
 	var details = {};
-	if (!fromsvg)
-		details.sosa = dom.attr('id');
-	else
-		details.sosa = dom.prev().attr('id');
+	if (!fromsvg){
+		details.sosa = dom.attr('id').split("_")[1];
+		details.sourceNb = dom.attr('id').split("_")[0];
+	} else {
+		details.sosa = dom.prev().attr('id').split("_")[1];
+		details.sourceNb = dom.prev().attr('id').split("_")[0];
+	}
 	//details.generation = nDom.attr('class').split(" ")[1];
 	//details.branch = nDom.attr('class').split(" ")[2].substring(6,nDom.attr('class').split(" ")[2].length);
-	pers = getPersDataFromId(details.sosa);
+	pers = getPersDataFromId(details.sosa, details.sourceNb);
 	if (!pers)
 		return;
 	details.brothers = "";

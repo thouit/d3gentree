@@ -18,11 +18,6 @@ var param = {
 	downOutsideDesc : 1, // should we write descendants counter-clockwise  ?
 	expandStartDesc : 0,
 	spouseRadiusRatio : 0.8,
-	angle : 1.2 * Math.PI,
-	angleStart : -0.1*Math.PI,//Math.PI/2.0,// please respect trigo direction
-	angleStop : Math.PI/2.0, //Math.PI*1.1,// please respect trigo direction
-	angleStart2 : Math.PI/2.0,
-	angleStop2 : Math.PI*1.1,
 	angleDesc : 0.8 * Math.PI, // if <0 then take the remaining space
 	padding : 0.1,
 	navigator : 2, //2 for chrome, 1 for Firefox
@@ -30,4 +25,9 @@ var param = {
 	ascDescSpacing : 5, //in pixels,
 	descGenerationSpacing : 5, //in pixels
 	displayAdditionalInfo : true,
+	data: [
+		{source: data, angleStart: -0.1*Math.PI, angleStop: 0.3*Math.PI, sourceNb: "0"},
+		{source: data2, angleStart: 0.3*Math.PI, angleStop: 0.7*Math.PI, sourceNb: "1"},
+		{source: data3, angleStart: 0.7*Math.PI, angleStop: Math.PI*1.1, sourceNb: "2"},
+	],
 }; 
