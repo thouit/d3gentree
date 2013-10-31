@@ -90,7 +90,7 @@ d3gentree.drawDescendant = function(indivData, sourceNb, inR_orig, startA_orig, 
 		var startA_s = startA_orig + m * lengthA;
 		var endA_s = startA_orig + (m + 1) * lengthA;
 		var inR = inR_orig;
-		var outR_s = inR + (generation > param.desc.expandStart ? param.general.radiusRadial : param.general.radius) * param.desc.spouseRadiusRatio;
+		var outR_s = inR + (generation > param.desc.expandStart ? param.general.radiusRadial : param.general.radius) * (generation > param.desc.expandStart ? param.desc.spouseRadiusRatio : 1);
 		indivData.marriages[m].spouse.index = indivData.index + "-" + m;
 		invert = startA_s > Math.PI ? true : false
 		d3gentree.drawPersCell(indivData.marriages[m].spouse, sourceNb, inR + param.general.padding / 2, outR_s - param.general.padding / 2, startA_s, endA_s, generation, (generation > param.desc.expandStart ? 1 : orient), (generation > param.desc.expandStart ? 1 : 0), invert, false)
