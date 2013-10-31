@@ -26,7 +26,6 @@ d3gentree.compute_canvas_size = function(sourceNb) {
 	d3gentree.w = 2 * rMax + 50;
 	d3gentree.h = 2 * rMax + 50;
 }
-
 // Draw center element
 d3gentree.draw_center = function(sourceNb) {
 	//add center text
@@ -319,7 +318,6 @@ d3gentree.drawPersCell = function(person, sourceNb, inR, outR, startA, endA, gen
 			}
 
 		} else if (generation < param.general.stopDisplayName) {
-			var toWrite = person.name + " " + person.fname;
 			if (invert) {
 				var x = (inR + 5) * Math.cos((endA + startA) / 2 - Math.PI / 2) + xShift;
 				var y = (inR + 5) * Math.sin((endA + startA) / 2 - Math.PI / 2) + yShift;
@@ -329,7 +327,7 @@ d3gentree.drawPersCell = function(person, sourceNb, inR, outR, startA, endA, gen
 				.attr("transform", "translate(" + x + "," + y + ") rotate(" + ((( orient ? 0 : 180) + ((endA + startA) / 2 + 0.01 - Math.PI / 2) * 180 / Math.PI) + 180) + " 0 0)")//
 				.style("font-weight", "bold")//
 				.style("text-anchor", "end")//
-				.attr("dy", param.general.fnameFontSize/2)//
+				.attr("dy", param.general.fnameFontSize / 2)//
 				.text(person.name.substring(0, maxLetter + 4)).append("tspan")//
 				.style("font-weight", "300")//
 				.text(" " + person.fname.substring(0, maxLetter + 4 - (person.name.length + 1)))
@@ -341,10 +339,10 @@ d3gentree.drawPersCell = function(person, sourceNb, inR, outR, startA, endA, gen
 				.style("font-size", param.general.fnameFontSize + "px")//
 				.attr("transform", "translate(" + x + "," + y + ") rotate(" + ((endA + startA) / 2 - 0.01 - Math.PI / 2) * 180 / (Math.PI) + " 0 0)")//
 				.style("font-weight", "bold")//
-				.attr("dy", param.general.fnameFontSize/2)//
+				.attr("dy", param.general.fnameFontSize / 2)//
 				.text(person.name.substring(0, maxLetter + 4)).append("tspan")//
 				.style("font-weight", "300")//
-				.text(" " + person.fname.substring(0, maxLetter + 4 - (person.name.length + 1))).text(toWrite.substring(0, Math.min(maxLetter + 4, toWrite.length + 1)));
+				.text(" " + person.fname.substring(0, maxLetter + 4 - (person.name.length + 1)))//
 			}
 		}
 	}

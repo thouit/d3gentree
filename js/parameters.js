@@ -19,7 +19,7 @@ var param = {
 		spouseColorRatio: 1.05,
 	},
 	desc: {
-		colors: {"H": ["rgb(250, 250, 255)", "rgb(245, 245, 255)"], "F": ["rgb(255, 250, 250)", "rgb(255, 245, 245)"]}, // Color per gender and then {spouse, direct child}
+		colors: {"H": ["rgb(250, 250, 255)", "rgb(250, 250, 255)"], "F": ["rgb(255, 255, 255)", "rgb(255, 255, 255)"]}, // Color per gender and then {spouse, direct child}
 		oneLineNameStart: 5, // When to use one line to display the name instead of two for the descendance
 		expandStart: 0, // when to switch to radial view for descendants
 		spouseRadiusRatio: 0.8,
