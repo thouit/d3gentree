@@ -26,6 +26,7 @@ d3gentree.compute_canvas_size = function(sourceNb) {
 	d3gentree.w = 2 * rMax + 50;
 	d3gentree.h = 2 * rMax + 50;
 }
+
 // Draw center element
 d3gentree.draw_center = function(sourceNb) {
 	//add center text
@@ -44,6 +45,7 @@ d3gentree.draw_center = function(sourceNb) {
 	.attr("text-anchor", "middle")//
 	.text(param.data[sourceNb].source.source.fname.substring(0, Math.min((param.general.centerSize * 2 / 9) + 1, param.data[sourceNb].source.source.fname.length + 1)));
 }
+
 d3gentree.drawAscendants = function(dataSource, sosa, inR_orig, startA_orig, endA_orig, orient) {
 	generation = parseInt(sosa).toString(2).length - 1;
 	branch = sosa - Math.pow(2, generation);
@@ -218,15 +220,13 @@ d3gentree.drawPersCell = function(person, sourceNb, inR, outR, startA, endA, gen
 		}
 	} else {
 		var maxLetter = (outR - inR) * 1.5 / param.general.fnameFontSize;
-		var lineThicknessCorrection = -9.0 / inR;
-		var lineThicknessCorrectionOneLine = -0.012;
 		if (generation < ( isAsc ? param.asc.oneLineNameStart : param.desc.oneLineNameStart)) {
 			if (invert) {
-				var x = (inR + 5) * Math.cos((endA + startA) / 2 - 0.005 - Math.PI / 2 + lineThicknessCorrection) + xShift;
-				var y = (inR + 5) * Math.sin((endA + startA) / 2 - 0.005 - Math.PI / 2 + lineThicknessCorrection) + yShift;
+				var x = (inR + 5) * Math.cos((endA + startA) / 2 - Math.PI / 2) + xShift;
+				var y = (inR + 5) * Math.sin((endA + startA) / 2 - Math.PI / 2) + yShift;
 
-				var xx = (inR + 5) * Math.cos((endA + startA) / 2 + 10.5 / inR - Math.PI / 2 + lineThicknessCorrection) + xShift;
-				var yy = (inR + 5) * Math.sin((endA + startA) / 2 + 10.5 / inR - Math.PI / 2 + lineThicknessCorrection) + yShift;
+				var xx = (inR + 5) * Math.cos((endA + startA) / 2 + 10.5 / inR - Math.PI / 2) + xShift;
+				var yy = (inR + 5) * Math.sin((endA + startA) / 2 + 10.5 / inR - Math.PI / 2) + yShift;
 
 				var xxx = outR * Math.cos(startA - Math.PI / 2) + xShift;
 				var yyy = outR * Math.sin(startA - Math.PI / 2) + yShift;
@@ -238,14 +238,16 @@ d3gentree.drawPersCell = function(person, sourceNb, inR, outR, startA, endA, gen
 				.style("font-size", param.general.nameFontSize + "px")//
 				.style("font-weight", "bold")//
 				.style("text-anchor", "end")//
-				.attr("transform", "translate(" + xx + "," + yy + ") rotate(" + ((( orient ? 0 : 180) + ((endA + startA) / 2 + 0.03 - Math.PI / 2) * 180 / Math.PI) + 180) + " 0 0)")//
+				.attr("dy", param.general.nameFontSize)//
+				.attr("transform", "translate(" + xx + "," + yy + ") rotate(" + ((( orient ? 0 : 180) + ((endA + startA) / 2 - Math.PI / 2) * 180 / Math.PI) + 180) + " 0 0)")//
 				.text(person.name.substring(0, Math.min(maxLetter + 1, person.name.length + 1)));
 
 				text.append("text")//
 				.style("font-size", param.general.fnameFontSize + "px")//
 				.style("font-weight", "300")//
 				.style("text-anchor", "end")//
-				.attr("transform", "translate(" + x + "," + y + ") rotate(" + ((( orient ? 0 : 180) + ((endA + startA) / 2 - 0.01 - Math.PI / 2) * 180 / Math.PI) + 180) + " 0 0)")//
+				.attr("dy", param.general.fnameFontSize)//
+				.attr("transform", "translate(" + x + "," + y + ") rotate(" + ((( orient ? 0 : 180) + ((endA + startA) / 2 - Math.PI / 2) * 180 / Math.PI) + 180) + " 0 0)")//
 				.text(person.fname.substring(0, Math.min(maxLetter + 4, person.fname.length + 1)));
 
 				if (param.general.displayAdditionalInfo) {
@@ -269,8 +271,8 @@ d3gentree.drawPersCell = function(person, sourceNb, inR, outR, startA, endA, gen
 					}
 				}
 			} else {
-				var x = (inR + 5) * Math.cos((endA + startA) / 2 - 0.005 - Math.PI / 2) + xShift;
-				var y = (inR + 5) * Math.sin((endA + startA) / 2 - 0.005 - Math.PI / 2) + yShift;
+				var x = (inR + 5) * Math.cos((endA + startA) / 2 - Math.PI / 2) + xShift;
+				var y = (inR + 5) * Math.sin((endA + startA) / 2 - Math.PI / 2) + yShift;
 
 				var xx = (inR + 5) * Math.cos((endA + startA) / 2 + 10.5 / inR - Math.PI / 2) + xShift;
 				var yy = (inR + 5) * Math.sin((endA + startA) / 2 + 10.5 / inR - Math.PI / 2) + yShift;
@@ -290,7 +292,7 @@ d3gentree.drawPersCell = function(person, sourceNb, inR, outR, startA, endA, gen
 				text.append("text")//
 				.style("font-size", param.general.fnameFontSize + "px")//
 				.style("font-weight", "300")//
-				.attr("transform", "translate(" + xx + "," + yy + ") rotate(" + (( orient ? 0 : 180) + ((endA + startA) / 2 + 0.03 - Math.PI / 2) * 180 / Math.PI) + " 0 0)")//
+				.attr("transform", "translate(" + xx + "," + yy + ") rotate(" + (( orient ? 0 : 180) + ((endA + startA) / 2 + 0.01 - Math.PI / 2) * 180 / Math.PI) + " 0 0)")//
 				.text(person.fname.substring(0, Math.min(maxLetter + 4, person.fname.length + 1)));
 
 				if (param.general.displayAdditionalInfo) {
@@ -319,25 +321,27 @@ d3gentree.drawPersCell = function(person, sourceNb, inR, outR, startA, endA, gen
 		} else if (generation < param.general.stopDisplayName) {
 			var toWrite = person.name + " " + person.fname;
 			if (invert) {
-				var x = (inR + 5) * Math.cos((endA + startA) / 2 + 0.005 - Math.PI / 2 + lineThicknessCorrectionOneLine) + xShift;
-				var y = (inR + 5) * Math.sin((endA + startA) / 2 + 0.005 - Math.PI / 2 + lineThicknessCorrectionOneLine) + yShift;
+				var x = (inR + 5) * Math.cos((endA + startA) / 2 - Math.PI / 2) + xShift;
+				var y = (inR + 5) * Math.sin((endA + startA) / 2 - Math.PI / 2) + yShift;
 
 				text.append("text")//
 				.style("font-size", param.general.fnameFontSize + "px")//
 				.attr("transform", "translate(" + x + "," + y + ") rotate(" + ((( orient ? 0 : 180) + ((endA + startA) / 2 + 0.01 - Math.PI / 2) * 180 / Math.PI) + 180) + " 0 0)")//
 				.style("font-weight", "bold")//
 				.style("text-anchor", "end")//
+				.attr("dy", param.general.fnameFontSize/2)//
 				.text(person.name.substring(0, maxLetter + 4)).append("tspan")//
 				.style("font-weight", "300")//
 				.text(" " + person.fname.substring(0, maxLetter + 4 - (person.name.length + 1)))
 			} else {
-				var x = (inR + 5) * Math.cos((endA + startA) / 2 + 0.005 - Math.PI / 2) + xShift;
-				var y = (inR + 5) * Math.sin((endA + startA) / 2 + 0.005 - Math.PI / 2) + yShift;
+				var x = (inR + 5) * Math.cos((endA + startA) / 2 - Math.PI / 2) + xShift;
+				var y = (inR + 5) * Math.sin((endA + startA) / 2 - Math.PI / 2) + yShift;
 
 				text.append("text")//
 				.style("font-size", param.general.fnameFontSize + "px")//
 				.attr("transform", "translate(" + x + "," + y + ") rotate(" + ((endA + startA) / 2 - 0.01 - Math.PI / 2) * 180 / (Math.PI) + " 0 0)")//
 				.style("font-weight", "bold")//
+				.attr("dy", param.general.fnameFontSize/2)//
 				.text(person.name.substring(0, maxLetter + 4)).append("tspan")//
 				.style("font-weight", "300")//
 				.text(" " + person.fname.substring(0, maxLetter + 4 - (person.name.length + 1))).text(toWrite.substring(0, Math.min(maxLetter + 4, toWrite.length + 1)));
