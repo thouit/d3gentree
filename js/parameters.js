@@ -29,8 +29,8 @@ var param = {
 	},
 	navigator: 2, //2 for chrome, 1 for Firefox
 	data: [
-		{source: data, angleStart: -0.1*Math.PI, angleStop: 1.1*Math.PI, sourceNb: "0"},
-		//{source: data2, angleStart: 0.3*Math.PI, angleStop: 0.7*Math.PI, sourceNb: "1"},
-		//{source: data3, angleStart: 0.7*Math.PI, angleStop: Math.PI*1.1, sourceNb: "2"},
+		{source: data, angleStart: -0.1*Math.PI, angleStop: 0.3*Math.PI, sourceNb: "0"},
+		{source: data2, angleStart: 0.3*Math.PI, angleStop: 0.7*Math.PI, sourceNb: "1"},
+		{source: data3, angleStart: 0.7*Math.PI, angleStop: Math.PI*1.1, sourceNb: "2"},
 	],
 }; 

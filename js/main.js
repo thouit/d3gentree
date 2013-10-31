@@ -17,7 +17,6 @@ d3gentree.encode_as_img_and_link = function() {
 }
 
 d3gentree.compute_canvas_size = function(sourceNb) {
-	d3gentree.r = 0;
 	if (param.data[sourceNb].source.ancestors.length < param.asc.expandStart) {
 		rMax = param.general.centerSize + param.general.radius * param.data[0].source.ancestors.length - param.general.padding / 2;
 	} else {
@@ -232,13 +231,15 @@ d3gentree.drawPersCell = function(person, sourceNb, inR, outR, startA, endA, gen
 
 				var xxxx = outR * Math.cos(endA - Math.PI / 2) + xShift;
 				var yyyy = outR * Math.sin(endA - Math.PI / 2) + yShift;
+				
+				var rotationAngle = ((( orient ? 0 : 180) + ((endA + startA) / 2 - Math.PI / 2) * 180 / Math.PI) + 180);
 
 				text.append("text")//
 				.style("font-size", param.general.nameFontSize + "px")//
 				.style("font-weight", "bold")//
 				.style("text-anchor", "end")//
 				.attr("dy", param.general.nameFontSize)//
-				.attr("transform", "translate(" + xx + "," + yy + ") rotate(" + ((( orient ? 0 : 180) + ((endA + startA) / 2 - Math.PI / 2) * 180 / Math.PI) + 180) + " 0 0)")//
+				.attr("transform", "translate(" + xx + "," + yy + ") rotate(" + rotationAngle + " 0 0)")//
 				.text(person.name.substring(0, Math.min(maxLetter + 1, person.name.length + 1)));
 
 				text.append("text")//
@@ -246,7 +247,7 @@ d3gentree.drawPersCell = function(person, sourceNb, inR, outR, startA, endA, gen
 				.style("font-weight", "300")//
 				.style("text-anchor", "end")//
 				.attr("dy", param.general.fnameFontSize)//
-				.attr("transform", "translate(" + x + "," + y + ") rotate(" + ((( orient ? 0 : 180) + ((endA + startA) / 2 - Math.PI / 2) * 180 / Math.PI) + 180) + " 0 0)")//
+				.attr("transform", "translate(" + x + "," + y + ") rotate(" + rotationAngle + " 0 0)")//
 				.text(person.fname.substring(0, Math.min(maxLetter + 4, person.fname.length + 1)));
 
 				if (param.general.displayAdditionalInfo) {
@@ -281,17 +282,19 @@ d3gentree.drawPersCell = function(person, sourceNb, inR, outR, startA, endA, gen
 
 				var xxxx = outR * Math.cos(endA - Math.PI / 2) + xShift;
 				var yyyy = outR * Math.sin(endA - Math.PI / 2) + yShift;
+				
+				var rotationAngle = (( orient ? 0 : 180) + ((endA + startA) / 2 - 0.01 - Math.PI / 2) * 180 / Math.PI);
 
 				text.append("text")//
 				.style("font-size", param.general.nameFontSize + "px")//
 				.style("font-weight", "bold")//
-				.attr("transform", "translate(" + x + "," + y + ") rotate(" + (( orient ? 0 : 180) + ((endA + startA) / 2 - 0.01 - Math.PI / 2) * 180 / Math.PI) + " 0 0)")//
+				.attr("transform", "translate(" + x + "," + y + ") rotate(" + rotationAngle + " 0 0)")//
 				.text(person.name.substring(0, Math.min(maxLetter + 1, person.name.length + 1)));
 
 				text.append("text")//
 				.style("font-size", param.general.fnameFontSize + "px")//
 				.style("font-weight", "300")//
-				.attr("transform", "translate(" + xx + "," + yy + ") rotate(" + (( orient ? 0 : 180) + ((endA + startA) / 2 + 0.01 - Math.PI / 2) * 180 / Math.PI) + " 0 0)")//
+				.attr("transform", "translate(" + xx + "," + yy + ") rotate(" + rotationAngle + " 0 0)")//
 				.text(person.fname.substring(0, Math.min(maxLetter + 4, person.fname.length + 1)));
 
 				if (param.general.displayAdditionalInfo) {
