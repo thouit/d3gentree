@@ -4,11 +4,12 @@ d3gentree.encode_as_img_and_link = function() {
 	// Add some critical information
 	svg = $("svg").attr({
 		version : '1.1',
-		xmlns : "http://www.w3.org/2000/svg"
+		xmlns : "http://www.w3.org/2000/svg",
+		"xmlns:xlink": "http://www.w3.org/1999/xlink"
 	});
 	xmlHeader = '<?xml version="1.0" encoding="Latin1"?>';
 
-	var b64 = btoa(xmlHeader + $("#svg").parent().html().replace(/’/g, "'"));
+	var b64 = btoa(xmlHeader + $("#svg").parent().html().replace(/’/g, "'").replace(/&nbsp;/g, " "));
 	// or use btoa if supported
 
 	// Works in recent Webkit(Chrome)
@@ -241,6 +242,7 @@ d3gentree.drawPersCell = function(person, sourceNb, inR, outR, startA, endA, gen
 				.style("text-anchor", "end")//
 				.attr("dy", param.general.nameFontSize)//
 				.attr("transform", "translate(" + xx + "," + yy + ") rotate(" + rotationAngle + " 0 0)")//
+				.attr("xlink:href", "#" + sourceNb + '_' + person.index)//
 				.text(person.name.substring(0, Math.min(maxLetter + 1, person.name.length + 1)));
 
 				text.append("text")//
@@ -249,6 +251,7 @@ d3gentree.drawPersCell = function(person, sourceNb, inR, outR, startA, endA, gen
 				.style("text-anchor", "end")//
 				.attr("dy", param.general.fnameFontSize)//
 				.attr("transform", "translate(" + x + "," + y + ") rotate(" + rotationAngle + " 0 0)")//
+				.attr("xlink:href", "#" + sourceNb + '_' + person.index)//
 				.text(person.fname.substring(0, Math.min(maxLetter + 4, person.fname.length + 1)));
 
 				if (param.general.displayAdditionalInfo) {
@@ -259,6 +262,7 @@ d3gentree.drawPersCell = function(person, sourceNb, inR, outR, startA, endA, gen
 						.attr("dx", 2)//
 						.attr("dy", -2)//
 						.attr("transform", "translate(" + xxxx + "," + yyyy + ") rotate(" + ((( orient ? 0 : 180) + (endA - Math.PI / 2) * 180 / Math.PI) + 180) + " 0 0)")//
+						.attr("xlink:href", "#" + sourceNb + '_' + person.index)//
 						.text(person.death.date);
 					}
 
@@ -268,6 +272,7 @@ d3gentree.drawPersCell = function(person, sourceNb, inR, outR, startA, endA, gen
 						.style("text-anchor", "begin")//
 						.attr("dx", 2)//
 						.attr("dy", 7).attr("transform", "translate(" + xxx + "," + yyy + ") rotate(" + ((( orient ? 0 : 180) + (startA - Math.PI / 2) * 180 / Math.PI) + 180) + " 0 0)")//
+						.attr("xlink:href", "#" + sourceNb + '_' + person.index)//
 						.text(person.birth.date);
 					}
 				}
@@ -290,12 +295,14 @@ d3gentree.drawPersCell = function(person, sourceNb, inR, outR, startA, endA, gen
 				.style("font-size", param.general.nameFontSize + "px")//
 				.style("font-weight", "bold")//
 				.attr("transform", "translate(" + x + "," + y + ") rotate(" + rotationAngle + " 0 0)")//
+				.attr("xlink:href", "#" + sourceNb + '_' + person.index)//
 				.text(person.name.substring(0, Math.min(maxLetter + 1, person.name.length + 1)));
 
 				text.append("text")//
 				.style("font-size", param.general.fnameFontSize + "px")//
 				.style("font-weight", "300")//
 				.attr("transform", "translate(" + xx + "," + yy + ") rotate(" + rotationAngle + " 0 0)")//
+				.attr("xlink:href", "#" + sourceNb + '_' + person.index)//
 				.text(person.fname.substring(0, Math.min(maxLetter + 4, person.fname.length + 1)));
 
 				if (param.general.displayAdditionalInfo) {
@@ -306,6 +313,7 @@ d3gentree.drawPersCell = function(person, sourceNb, inR, outR, startA, endA, gen
 						.attr("dx", -2)//
 						.attr("dy", 7)//
 						.attr("transform", "translate(" + xxxx + "," + yyyy + ") rotate(" + ((( orient ? 0 : 180) + (endA - Math.PI / 2) * 180 / Math.PI)) + " 0 0)")//
+						.attr("xlink:href", "#" + sourceNb + '_' + person.index)//
 						.text(person.birth.date);
 					}
 
@@ -316,6 +324,7 @@ d3gentree.drawPersCell = function(person, sourceNb, inR, outR, startA, endA, gen
 						.attr("dx", -2)//
 						.attr("dy", -2)//
 						.attr("transform", "translate(" + xxx + "," + yyy + ") rotate(" + ((( orient ? 0 : 180) + (startA - Math.PI / 2) * 180 / Math.PI)) + " 0 0)")//
+						.attr("xlink:href", "#" + sourceNb + '_' + person.index)//
 						.text(person.death.date);
 					}
 				}
@@ -334,6 +343,7 @@ d3gentree.drawPersCell = function(person, sourceNb, inR, outR, startA, endA, gen
 				.attr("dy", param.general.fnameFontSize / 2)//
 				.text(person.name.substring(0, maxLetter + 4)).append("tspan")//
 				.style("font-weight", "300")//
+				.attr("xlink:href", "#" + sourceNb + '_' + person.index)//
 				.text(" " + person.fname.substring(0, maxLetter + 4 - (person.name.length + 1)))
 			} else {
 				var x = (inR + 5) * Math.cos((endA + startA) / 2 - Math.PI / 2) + xShift;
@@ -346,6 +356,7 @@ d3gentree.drawPersCell = function(person, sourceNb, inR, outR, startA, endA, gen
 				.attr("dy", param.general.fnameFontSize / 2)//
 				.text(person.name.substring(0, maxLetter + 4)).append("tspan")//
 				.style("font-weight", "300")//
+				.attr("xlink:href", "#" + sourceNb + '_' + person.index)//
 				.text(" " + person.fname.substring(0, maxLetter + 4 - (person.name.length + 1)))//
 			}
 		}
@@ -454,7 +465,7 @@ $(document).mousemove(function(e) {
 	var svg_xml = (new XMLSerializer()).serializeToString(document.getElementById("svg"));
 
 	//display source code
-	$("#code").text(svg_xml.replace(/’/g, "'"));
+	$("#code").text(svg_xml.replace(/’/g, "'").replace(/&nbsp;/g, " "));
 
 	d3gentree.mouseX
 	d3gentree.mouseY
