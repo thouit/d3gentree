@@ -71,7 +71,7 @@ textarea {
     width:800px;
     height:100px;
     margin:auto;
-    visibility: hidden;
+    /*visibility: hidden;*/
 }
 
 #container{

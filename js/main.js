@@ -1,4 +1,4 @@
-var d3gentree = d3gentree || {};
+﻿var d3gentree = d3gentree || {};
 
 d3gentree.encode_as_img_and_link = function() {
 	// Add some critical information
@@ -7,7 +7,8 @@ d3gentree.encode_as_img_and_link = function() {
 		xmlns : "http://www.w3.org/2000/svg"
 	});
 	xmlHeader = '<?xml version="1.0" encoding="Latin1"?>';
-	var b64 = btoa(xmlHeader + $("#svg").parent().html());
+
+	var b64 = btoa(xmlHeader + $("#svg").parent().html().replace(/’/g, "'"));
 	// or use btoa if supported
 
 	// Works in recent Webkit(Chrome)
@@ -231,7 +232,7 @@ d3gentree.drawPersCell = function(person, sourceNb, inR, outR, startA, endA, gen
 
 				var xxxx = outR * Math.cos(endA - Math.PI / 2) + xShift;
 				var yyyy = outR * Math.sin(endA - Math.PI / 2) + yShift;
-				
+
 				var rotationAngle = ((( orient ? 0 : 180) + ((endA + startA) / 2 - Math.PI / 2) * 180 / Math.PI) + 180);
 
 				text.append("text")//
@@ -282,7 +283,7 @@ d3gentree.drawPersCell = function(person, sourceNb, inR, outR, startA, endA, gen
 
 				var xxxx = outR * Math.cos(endA - Math.PI / 2) + xShift;
 				var yyyy = outR * Math.sin(endA - Math.PI / 2) + yShift;
-				
+
 				var rotationAngle = (( orient ? 0 : 180) + ((endA + startA) / 2 - 0.01 - Math.PI / 2) * 180 / Math.PI);
 
 				text.append("text")//
@@ -448,12 +449,12 @@ $(document).mousemove(function(e) {
 
 	d3gentree.drawDescendant(param.data[param.desc.sourceNb].source.source, param.data[param.desc.sourceNb].sourceNb, param.general.centerSize, Math.PI + param.desc.angle / 2, Math.PI - param.desc.angle / 2, 0, 0);
 
-	//setTimeout(d3gentree.encode_as_img_and_link, 1000);
+	setTimeout(d3gentree.encode_as_img_and_link, 1000);
 
 	var svg_xml = (new XMLSerializer()).serializeToString(document.getElementById("svg"));
 
 	//display source code
-	$("#code").text(svg_xml);
+	$("#code").text(svg_xml.replace(/’/g, "'"));
 
 	d3gentree.mouseX
 	d3gentree.mouseY
