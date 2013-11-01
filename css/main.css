@@ -71,7 +71,7 @@ textarea {
     width:800px;
     height:100px;
     margin:auto;
-    /*visibility: hidden;*/
+    visibility: hidden;
 }
 
 #container{
@@ -103,8 +103,8 @@ svg{
 }
 
 .download{
-    position: absolute;
-    top: 20px;
+    position: fixed;
+    top: 10px;
     right: 10px;
 }
 .download a {
