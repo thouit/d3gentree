@@ -5,7 +5,7 @@ d3gentree.encode_as_img_and_link = function() {
 	svg = $("svg").attr({
 		version : '1.1',
 		xmlns : "http://www.w3.org/2000/svg",
-		"xmlns:xlink": "http://www.w3.org/1999/xlink"
+		"xmlns:xlink" : "http://www.w3.org/1999/xlink"
 	});
 	xmlHeader = '<?xml version="1.0" encoding="Latin1"?>';
 
@@ -153,7 +153,6 @@ d3gentree.drawPersCell = function(person, sourceNb, inR, outR, startA, endA, gen
 	.style("stroke", param.general.strokeColor)//
 	.attr("class", "arc " + generation + " branch")//
 	.attr("id", sourceNb + '_' + person.index);
-	//
 
 	var text = d3gentree.vis.append("g")//
 	.attr("class", "text");
@@ -427,13 +426,51 @@ d3gentree.log2int = function(nb) {
 	return Math.ceil(Math.log(nb) / Math.log(2)) - 1;
 }
 
+d3gentree.draw = function() {
+	for (var i = 0; i < param.data.length; i++) {
+		d3gentree.drawAscendants(param.data[i], 1, param.general.centerSize, -param.data[i].angleStart + Math.PI / 2.0, -param.data[i].angleStop + Math.PI / 2.0, 1);
+	}
+
+	d3gentree.drawDescendant(param.data[param.desc.sourceNb].source.source, param.data[param.desc.sourceNb].sourceNb, param.general.centerSize, Math.PI + param.desc.angle / 2, Math.PI - param.desc.angle / 2, 0, 0);
+
+	setTimeout(d3gentree.encode_as_img_and_link, 1000);
+}
+
+d3gentree.rotate_all = function(angle) {
+	d3gentree.currentangle += angle;
+	d3gentree.vis//
+	.transition()//
+	.duration(2000)//
+	.attr("transform", "translate(" + d3gentree.w / 2 + "," + d3gentree.h / 2 + ")rotate(" + d3gentree.currentangle + ")")
+}
+
 $(document).mousemove(function(e) {
 	d3gentree.mouseX = e.pageX + 15;
 	d3gentree.mouseY = e.pageY + 5;
 	$("#details").css("top", d3gentree.mouseY + "px").css("left", d3gentree.mouseX + "px");
+	if (d3gentree.isDragging){
+		//var dx = e.pageX - d3gentree.xorig;
+    	//var dy = e.pageY - d3gentree.yorig;
+    	//var angle = Math.sqrt((dx * dx) + (dy * dy));
+    	if (e.pageX < d3gentree.w / 2)
+    		d3gentree.rotate_all(-1)
+    	else
+    		d3gentree.rotate_all(1)
+    	//d3gentree.xorig = e.pageX;
+		//d3gentree.yorig = e.pageY;
+	}
+	
+})
+.mousedown(function(e) {
+    d3gentree.isDragging = true;
+})
+.mouseup(function(e) {
+    d3gentree.isDragging = false;
 });
 
 (function() {
+	d3gentree.isDragging = false;
+	d3gentree.currentangle = 0;
 	d3gentree.compute_canvas_size(0);
 
 	d3gentree.vis = d3.select("#container").append("svg:svg")//create the SVG element inside the <body>
@@ -445,18 +482,12 @@ $(document).mousemove(function(e) {
 
 	d3gentree.draw_center(0);
 
-	for (var i = 0; i < param.data.length; i++) {
-		d3gentree.drawAscendants(param.data[i], 1, param.general.centerSize, -param.data[i].angleStart + Math.PI / 2.0, -param.data[i].angleStop + Math.PI / 2.0, 1);
-	}
-
-	d3gentree.drawDescendant(param.data[param.desc.sourceNb].source.source, param.data[param.desc.sourceNb].sourceNb, param.general.centerSize, Math.PI + param.desc.angle / 2, Math.PI - param.desc.angle / 2, 0, 0);
-
-	setTimeout(d3gentree.encode_as_img_and_link, 1000);
+	d3gentree.draw();
 
 	var svg_xml = (new XMLSerializer()).serializeToString(document.getElementById("svg"));
 
 	//display source code
-	$("#code").text(svg_xml.replace(/’/g, "'").replace(/&nbsp;/g, " "));
+	//$("#code").text(svg_xml.replace(/’/g, "'").replace(/&nbsp;/g, " "));
 
 	d3gentree.mouseX
 	d3gentree.mouseY
