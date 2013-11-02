@@ -213,7 +213,7 @@ d3gentree.drawPersCell = function(person, sourceNb, inR, outR, startA, endA, gen
 				.attr("method", "stretch") //
 				.attr("spacing", "auto") //
 				.append("textPath") //
-				.attr("xlink:href", "#" + sourceNb + '-' + person.index) //
+				.attr("xlink:href", "#" + sourceNb + '_' + person.index) //
 				.attr("text-anchor", "end") //
 				.text(person.death.date);
 			}
