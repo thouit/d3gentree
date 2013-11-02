@@ -1,6 +1,7 @@
 var parameters = function() {
 	this.general = {
-		strokeColor: "#BBB", //
+		strokeColor: "#BBBBBB", //
+		displayAdditionalInfo: true, // display additional information into each cell such as birth and death date and place
 		additionalInfoFontSize: 6, // font size for additionnal informations (date and place of birth and death for example)
 		ascDescSpacing: 15, // spacing between ascendant and descendant tree in pixels,
 		radius: 55, // radius of a normal cell
@@ -10,7 +11,6 @@ var parameters = function() {
 		fnameFontSize: 10, // font size for the first name
 		stopDisplayName: 9, // when to stop to display any information
 		padding: 0.1, //
-		displayAdditionalInfo: true, // display additional information into each cell such as birth and death date and place
 	};
 	this.asc = {
 		colors: [[250, 250, 250]], // colors per generation

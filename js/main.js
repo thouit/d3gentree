@@ -3,9 +3,9 @@
 d3gentree.encode_as_img_and_link = function() {
 	// Add some critical information
 	svg = $("svg").attr({
-		version : '1.1',
-		xmlns : "http://www.w3.org/2000/svg",
-		"xmlns:xlink" : "http://www.w3.org/1999/xlink"
+		version: '1.1',
+		xmlns: "http://www.w3.org/2000/svg",
+		"xmlns:xlink": "http://www.w3.org/1999/xlink"
 	});
 	xmlHeader = '<?xml version="1.0" encoding="Latin1"?>';
 
@@ -31,19 +31,19 @@ d3gentree.compute_canvas_size = function(sourceNb) {
 // Draw center element
 d3gentree.draw_center = function(sourceNb) {
 	//add center text
-	var centerText = d3gentree.vis.append("g")//
-	.attr("class", "text")//
+	var centerText = d3gentree.vis.append("g") //
+	.attr("class", "text") //
 	.style("fill", "black");
 
-	centerText.append("text")//
-	.style("font-size", d3gentree.param.general.nameFontSize + "px")//
-	.style("font-weight", "bold")//
-	.attr("dy", -5).attr("text-anchor", "middle")//
+	centerText.append("text") //
+	.style("font-size", d3gentree.param.general.nameFontSize + "px") //
+	.style("font-weight", "bold") //
+	.attr("dy", -5).attr("text-anchor", "middle") //
 	.text(d3gentree.param.data[sourceNb].source.source.name.substring(0, Math.min((d3gentree.param.general.centerSize * 2 / 9) + 1, d3gentree.param.data[sourceNb].source.source.name.length + 1)));
 
-	centerText.append("text")//
-	.attr("dy", 15).style("font-size", d3gentree.param.general.fnameFontSize + "px")//
-	.attr("text-anchor", "middle")//
+	centerText.append("text") //
+	.attr("dy", 15).style("font-size", d3gentree.param.general.fnameFontSize + "px") //
+	.attr("text-anchor", "middle") //
 	.text(d3gentree.param.data[sourceNb].source.source.fname.substring(0, Math.min((d3gentree.param.general.centerSize * 2 / 9) + 1, d3gentree.param.data[sourceNb].source.source.fname.length + 1)));
 }
 
@@ -60,7 +60,7 @@ d3gentree.drawAscendants = function(dataSource, sosa, inR_orig, startA_orig, end
 	var outR = inR_orig + thisR;
 	pers = undefined;
 	if (generation > 0 && dataSource.source.ancestors[generation - 1]) {
-		pers = dataSource.source.ancestors[generation-1][branch];
+		pers = dataSource.source.ancestors[generation - 1][branch];
 		if (pers) {
 			dataSource.source.ancestors[generation - 1][branch].index = sosa;
 			invert = startA_orig <= 0 ? true : false
@@ -136,91 +136,91 @@ d3gentree.drawPersCell = function(person, sourceNb, inR, outR, startA, endA, gen
 	var xShift = 0;
 	var yShift = isAsc ? 0 : d3gentree.param.general.ascDescSpacing;
 
-	var elem = d3gentree.vis.append("svg:path")//
-	.attr("d", d3gentree.myarc(inR, outR, startA, endA, orient))//
-	.attr("transform", "translate(" + xShift + "," + yShift + ")")//
+	var elem = d3gentree.vis.append("svg:path") //
+	.attr("d", d3gentree.myarc(inR, outR, startA, endA, orient)) //
+	.attr("transform", "translate(" + xShift + "," + yShift + ")") //
 	.attr("fill", function() {
 		if (isAsc) {
 			if (person.gender == "H")
-				return d3.rgb(d3gentree.param.asc.colors[generation%d3gentree.param.asc.colors.length][0], d3gentree.param.asc.colors[generation%d3gentree.param.asc.colors.length][1], d3gentree.param.asc.colors[generation%d3gentree.param.asc.colors.length][2]);
+				return d3.rgb(d3gentree.param.asc.colors[generation % d3gentree.param.asc.colors.length][0], d3gentree.param.asc.colors[generation % d3gentree.param.asc.colors.length][1], d3gentree.param.asc.colors[generation % d3gentree.param.asc.colors.length][2]);
 			else
-				return d3.rgb(Math.min(d3gentree.param.asc.colors[generation%d3gentree.param.asc.colors.length][0] * d3gentree.param.asc.spouseColorRatio, 255), Math.min(d3gentree.param.asc.colors[generation%d3gentree.param.asc.colors.length][1] * d3gentree.param.asc.spouseColorRatio, 255), Math.min(d3gentree.param.asc.colors[generation%d3gentree.param.asc.colors.length][2] * d3gentree.param.asc.spouseColorRatio, 255));
+				return d3.rgb(Math.min(d3gentree.param.asc.colors[generation % d3gentree.param.asc.colors.length][0] * d3gentree.param.asc.spouseColorRatio, 255), Math.min(d3gentree.param.asc.colors[generation % d3gentree.param.asc.colors.length][1] * d3gentree.param.asc.spouseColorRatio, 255), Math.min(d3gentree.param.asc.colors[generation % d3gentree.param.asc.colors.length][2] * d3gentree.param.asc.spouseColorRatio, 255));
 		} else {
 			if (person.gender == "?")
 				return 'rgb(255,255,255)';
 			return d3.rgb(d3gentree.param.desc.colors[person.gender][generation % (d3gentree.param.desc.colors[person.gender].length)]);
 		}
-	}).style("stroke-width", d3gentree.param.general.padding * 2)//
-	.style("stroke", d3gentree.param.general.strokeColor)//
-	.attr("class", "arc " + generation + " branch")//
+	}).style("stroke-width", d3gentree.param.general.padding * 2) //
+	.style("stroke", d3gentree.param.general.strokeColor) //
+	.attr("class", "arc " + generation + " branch") //
 	.attr("id", sourceNb + '_' + person.index);
 
-	var text = d3gentree.vis.append("g")//
+	var text = d3gentree.vis.append("g") //
 	.attr("class", "text");
 
 	if (!radialText) {
-		var spaceLength = lengthA * ( isAsc ? outR : inR);
+		var spaceLength = lengthA * (isAsc ? outR : inR);
 		var maxLetter = spaceLength * 2 / d3gentree.param.general.fnameFontSize - 3;
 
 		var letterSpacingName = isAsc ? "1px" : "Opx"
 		var letterSpacingfName = isAsc ? "2px" : "-1px"
 
-		text.append("text")//
-		.style("font-size", d3gentree.param.general.nameFontSize + "px")//
-		.style("font-weight", "bold")//
-		.style("letter-spacing", letterSpacingName)//
-		.attr("dx", spaceLength / 2.0)//just half of the dx attribute is taken into account when text-anchor middle is used on firefox, works properly on chrome
-		.attr("dy", d3gentree.param.general.radius * 0.4)//
-		.attr("method", "stretch")//
-		.attr("spacing", "auto")//
-		.append("textPath")//
-		.attr("xlink:href", "#" + sourceNb + '_' + person.index)//
-		.attr("text-anchor", "middle")//
+		text.append("text") //
+		.style("font-size", d3gentree.param.general.nameFontSize + "px") //
+		.style("font-weight", "bold") //
+		.style("letter-spacing", letterSpacingName) //
+		.attr("dx", spaceLength / 2.0) //just half of the dx attribute is taken into account when text-anchor middle is used on firefox, works properly on chrome
+		.attr("dy", d3gentree.param.general.radius * 0.4) //
+		.attr("method", "stretch") //
+		.attr("spacing", "auto") //
+		.append("textPath") //
+		.attr("xlink:href", "#" + sourceNb + '_' + person.index) //
+		.attr("text-anchor", "middle") //
 		.text(person.name.substring(0, Math.min(maxLetter + 1, person.name.length + 1)));
 
-		text.append("text")//
-		.style("font-size", d3gentree.param.general.fnameFontSize + "px")//
-		.style("font-weight", "300")//
-		.style("letter-spacing", letterSpacingfName)//
-		.attr("dx", spaceLength / 2.0)//just half of the dx attribute is taken into account when text-anchor middle is used on firefox, works properly on chrome
-		.attr("dy", d3gentree.param.general.radius * 0.8)//
-		.attr("method", "stretch")//
-		.attr("spacing", "auto")//
-		.append("textPath")//
-		.attr("xlink:href", "#" + sourceNb + '_' + person.index)//
-		.attr("text-anchor", "middle")//
+		text.append("text") //
+		.style("font-size", d3gentree.param.general.fnameFontSize + "px") //
+		.style("font-weight", "300") //
+		.style("letter-spacing", letterSpacingfName) //
+		.attr("dx", spaceLength / 2.0) //just half of the dx attribute is taken into account when text-anchor middle is used on firefox, works properly on chrome
+		.attr("dy", d3gentree.param.general.radius * 0.8) //
+		.attr("method", "stretch") //
+		.attr("spacing", "auto") //
+		.append("textPath") //
+		.attr("xlink:href", "#" + sourceNb + '_' + person.index) //
+		.attr("text-anchor", "middle") //
 		.text(person.fname.substring(0, Math.min(maxLetter + 2, person.fname.length + 1)));
 
 		if (d3gentree.param.general.displayAdditionalInfo) {
 			if (person.birth != null) {
-				text.append("text")//
-				.style("font-size", d3gentree.param.general.additionalInfoFontSize + "px")//
-				.attr("dx", 2)//
-				.attr("dy", d3gentree.param.general.radius * 0.12)//
-				.attr("method", "stretch")//
-				.attr("spacing", "auto")//
-				.append("textPath")//
-				.attr("xlink:href", "#" + sourceNb + '_' + person.index)//
-				.attr("text-anchor", "begin")//
+				text.append("text") //
+				.style("font-size", d3gentree.param.general.additionalInfoFontSize + "px") //
+				.attr("dx", 2) //
+				.attr("dy", d3gentree.param.general.radius * 0.12) //
+				.attr("method", "stretch") //
+				.attr("spacing", "auto") //
+				.append("textPath") //
+				.attr("xlink:href", "#" + sourceNb + '_' + person.index) //
+				.attr("text-anchor", "begin") //
 				.text(person.birth.date);
 			}
 
 			if (person.death != null) {
-				text.append("text")//
-				.style("font-size", d3gentree.param.general.additionalInfoFontSize + "px")//
-				.attr("dx", spaceLength - 2)//
-				.attr("dy", d3gentree.param.general.radius * 0.12)//
-				.attr("method", "stretch")//
-				.attr("spacing", "auto")//
-				.append("textPath")//
-				.attr("xlink:href", "#" + sourceNb + '-' + person.index)//
-				.attr("text-anchor", "end")//
+				text.append("text") //
+				.style("font-size", d3gentree.param.general.additionalInfoFontSize + "px") //
+				.attr("dx", spaceLength - 2) //
+				.attr("dy", d3gentree.param.general.radius * 0.12) //
+				.attr("method", "stretch") //
+				.attr("spacing", "auto") //
+				.append("textPath") //
+				.attr("xlink:href", "#" + sourceNb + '-' + person.index) //
+				.attr("text-anchor", "end") //
 				.text(person.death.date);
 			}
 		}
 	} else {
 		var maxLetter = (outR - inR) * 1.5 / d3gentree.param.general.fnameFontSize;
-		if (generation < ( isAsc ? d3gentree.param.asc.oneLineNameStart : d3gentree.param.desc.oneLineNameStart)) {
+		if (generation < (isAsc ? d3gentree.param.asc.oneLineNameStart : d3gentree.param.desc.oneLineNameStart)) {
 			if (invert) {
 				var x = (inR + 5) * Math.cos((endA + startA) / 2 - Math.PI / 2) + xShift;
 				var y = (inR + 5) * Math.sin((endA + startA) / 2 - Math.PI / 2) + yShift;
@@ -234,41 +234,41 @@ d3gentree.drawPersCell = function(person, sourceNb, inR, outR, startA, endA, gen
 				var xxxx = outR * Math.cos(endA - Math.PI / 2) + xShift;
 				var yyyy = outR * Math.sin(endA - Math.PI / 2) + yShift;
 
-				var rotationAngle = ((( orient ? 0 : 180) + ((endA + startA) / 2 - Math.PI / 2) * 180 / Math.PI) + 180);
+				var rotationAngle = (((orient ? 0 : 180) + ((endA + startA) / 2 - Math.PI / 2) * 180 / Math.PI) + 180);
 
-				text.append("text")//
-				.style("font-size", d3gentree.param.general.nameFontSize + "px")//
-				.style("font-weight", "bold")//
-				.style("text-anchor", "end")//
-				.attr("dy", d3gentree.param.general.nameFontSize)//
-				.attr("transform", "translate(" + xx + "," + yy + ") rotate(" + rotationAngle + " 0 0)")//
+				text.append("text") //
+				.style("font-size", d3gentree.param.general.nameFontSize + "px") //
+				.style("font-weight", "bold") //
+				.style("text-anchor", "end") //
+				.attr("dy", d3gentree.param.general.nameFontSize) //
+				.attr("transform", "translate(" + xx + "," + yy + ") rotate(" + rotationAngle + " 0 0)") //
 				.text(person.name.substring(0, Math.min(maxLetter + 1, person.name.length + 1)));
 
-				text.append("text")//
-				.style("font-size", d3gentree.param.general.fnameFontSize + "px")//
-				.style("font-weight", "300")//
-				.style("text-anchor", "end")//
-				.attr("dy", d3gentree.param.general.fnameFontSize)//
-				.attr("transform", "translate(" + x + "," + y + ") rotate(" + rotationAngle + " 0 0)")//
+				text.append("text") //
+				.style("font-size", d3gentree.param.general.fnameFontSize + "px") //
+				.style("font-weight", "300") //
+				.style("text-anchor", "end") //
+				.attr("dy", d3gentree.param.general.fnameFontSize) //
+				.attr("transform", "translate(" + x + "," + y + ") rotate(" + rotationAngle + " 0 0)") //
 				.text(person.fname.substring(0, Math.min(maxLetter + 4, person.fname.length + 1)));
 
 				if (d3gentree.param.general.displayAdditionalInfo) {
 					if (person.death != null) {
-						text.append("text")//
-						.style("font-size", d3gentree.param.general.additionalInfoFontSize + "px")//
-						.style("text-anchor", "begin")//
-						.attr("dx", 2)//
-						.attr("dy", -2)//
-						.attr("transform", "translate(" + xxxx + "," + yyyy + ") rotate(" + ((( orient ? 0 : 180) + (endA - Math.PI / 2) * 180 / Math.PI) + 180) + " 0 0)")//
+						text.append("text") //
+						.style("font-size", d3gentree.param.general.additionalInfoFontSize + "px") //
+						.style("text-anchor", "begin") //
+						.attr("dx", 2) //
+						.attr("dy", -2) //
+						.attr("transform", "translate(" + xxxx + "," + yyyy + ") rotate(" + (((orient ? 0 : 180) + (endA - Math.PI / 2) * 180 / Math.PI) + 180) + " 0 0)") //
 						.text(person.death.date);
 					}
 
 					if (person.birth != null) {
-						text.append("text")//
-						.style("font-size", d3gentree.param.general.additionalInfoFontSize + "px")//
-						.style("text-anchor", "begin")//
-						.attr("dx", 2)//
-						.attr("dy", 7).attr("transform", "translate(" + xxx + "," + yyy + ") rotate(" + ((( orient ? 0 : 180) + (startA - Math.PI / 2) * 180 / Math.PI) + 180) + " 0 0)")//
+						text.append("text") //
+						.style("font-size", d3gentree.param.general.additionalInfoFontSize + "px") //
+						.style("text-anchor", "begin") //
+						.attr("dx", 2) //
+						.attr("dy", 7).attr("transform", "translate(" + xxx + "," + yyy + ") rotate(" + (((orient ? 0 : 180) + (startA - Math.PI / 2) * 180 / Math.PI) + 180) + " 0 0)") //
 						.text(person.birth.date);
 					}
 				}
@@ -285,39 +285,39 @@ d3gentree.drawPersCell = function(person, sourceNb, inR, outR, startA, endA, gen
 				var xxxx = outR * Math.cos(endA - Math.PI / 2) + xShift;
 				var yyyy = outR * Math.sin(endA - Math.PI / 2) + yShift;
 
-				var rotationAngle = (( orient ? 0 : 180) + ((endA + startA) / 2 - 0.01 - Math.PI / 2) * 180 / Math.PI);
+				var rotationAngle = ((orient ? 0 : 180) + ((endA + startA) / 2 - 0.01 - Math.PI / 2) * 180 / Math.PI);
 
-				text.append("text")//
-				.style("font-size", d3gentree.param.general.nameFontSize + "px")//
-				.style("font-weight", "bold")//
-				.attr("transform", "translate(" + x + "," + y + ") rotate(" + rotationAngle + " 0 0)")//
+				text.append("text") //
+				.style("font-size", d3gentree.param.general.nameFontSize + "px") //
+				.style("font-weight", "bold") //
+				.attr("transform", "translate(" + x + "," + y + ") rotate(" + rotationAngle + " 0 0)") //
 				.text(person.name.substring(0, Math.min(maxLetter + 1, person.name.length + 1)));
 
-				text.append("text")//
-				.style("font-size", d3gentree.param.general.fnameFontSize + "px")//
-				.style("font-weight", "300")//
-				.attr("transform", "translate(" + xx + "," + yy + ") rotate(" + rotationAngle + " 0 0)")//
+				text.append("text") //
+				.style("font-size", d3gentree.param.general.fnameFontSize + "px") //
+				.style("font-weight", "300") //
+				.attr("transform", "translate(" + xx + "," + yy + ") rotate(" + rotationAngle + " 0 0)") //
 				.text(person.fname.substring(0, Math.min(maxLetter + 4, person.fname.length + 1)));
 
 				if (d3gentree.param.general.displayAdditionalInfo) {
 					if (person.birth != null) {
-						text.append("text")//
-						.style("font-size", d3gentree.param.general.additionalInfoFontSize + "px")//
-						.style("text-anchor", "end")//
-						.attr("dx", -2)//
-						.attr("dy", 7)//
-						.attr("transform", "translate(" + xxxx + "," + yyyy + ") rotate(" + ((( orient ? 0 : 180) + (endA - Math.PI / 2) * 180 / Math.PI)) + " 0 0)")//
-						.attr("xlink:href", "#" + sourceNb + '_' + person.index)//
+						text.append("text") //
+						.style("font-size", d3gentree.param.general.additionalInfoFontSize + "px") //
+						.style("text-anchor", "end") //
+						.attr("dx", -2) //
+						.attr("dy", 7) //
+						.attr("transform", "translate(" + xxxx + "," + yyyy + ") rotate(" + (((orient ? 0 : 180) + (endA - Math.PI / 2) * 180 / Math.PI)) + " 0 0)") //
+						.attr("xlink:href", "#" + sourceNb + '_' + person.index) //
 						.text(person.birth.date);
 					}
 
 					if (person.death != null) {
-						text.append("text")//
-						.style("font-size", d3gentree.param.general.additionalInfoFontSize + "px")//
-						.style("text-anchor", "end")//
-						.attr("dx", -2)//
-						.attr("dy", -2)//
-						.attr("transform", "translate(" + xxx + "," + yyy + ") rotate(" + ((( orient ? 0 : 180) + (startA - Math.PI / 2) * 180 / Math.PI)) + " 0 0)")//
+						text.append("text") //
+						.style("font-size", d3gentree.param.general.additionalInfoFontSize + "px") //
+						.style("text-anchor", "end") //
+						.attr("dx", -2) //
+						.attr("dy", -2) //
+						.attr("transform", "translate(" + xxx + "," + yyy + ") rotate(" + (((orient ? 0 : 180) + (startA - Math.PI / 2) * 180 / Math.PI)) + " 0 0)") //
 						.text(person.death.date);
 					}
 				}
@@ -328,27 +328,27 @@ d3gentree.drawPersCell = function(person, sourceNb, inR, outR, startA, endA, gen
 				var x = (inR + 5) * Math.cos((endA + startA) / 2 - Math.PI / 2) + xShift;
 				var y = (inR + 5) * Math.sin((endA + startA) / 2 - Math.PI / 2) + yShift;
 
-				text.append("text")//
-				.style("font-size", d3gentree.param.general.fnameFontSize + "px")//
-				.attr("transform", "translate(" + x + "," + y + ") rotate(" + ((( orient ? 0 : 180) + ((endA + startA) / 2 + 0.01 - Math.PI / 2) * 180 / Math.PI) + 180) + " 0 0)")//
-				.style("font-weight", "bold")//
-				.style("text-anchor", "end")//
-				.attr("dy", d3gentree.param.general.fnameFontSize / 2)//
-				.text(person.name.substring(0, maxLetter + 4)).append("tspan")//
-				.style("font-weight", "300")//
+				text.append("text") //
+				.style("font-size", d3gentree.param.general.fnameFontSize + "px") //
+				.attr("transform", "translate(" + x + "," + y + ") rotate(" + (((orient ? 0 : 180) + ((endA + startA) / 2 + 0.01 - Math.PI / 2) * 180 / Math.PI) + 180) + " 0 0)") //
+				.style("font-weight", "bold") //
+				.style("text-anchor", "end") //
+				.attr("dy", d3gentree.param.general.fnameFontSize / 2) //
+				.text(person.name.substring(0, maxLetter + 4)).append("tspan") //
+				.style("font-weight", "300") //
 				.text(" " + person.fname.substring(0, maxLetter + 4 - (person.name.length + 1)))
 			} else {
 				var x = (inR + 5) * Math.cos((endA + startA) / 2 - Math.PI / 2) + xShift;
 				var y = (inR + 5) * Math.sin((endA + startA) / 2 - Math.PI / 2) + yShift;
 
-				text.append("text")//
-				.style("font-size", d3gentree.param.general.fnameFontSize + "px")//
-				.attr("transform", "translate(" + x + "," + y + ") rotate(" + ((endA + startA) / 2 - 0.01 - Math.PI / 2) * 180 / (Math.PI) + " 0 0)")//
-				.style("font-weight", "bold")//
-				.attr("dy", d3gentree.param.general.fnameFontSize / 2)//
-				.text(person.name.substring(0, maxLetter + 4)).append("tspan")//
-				.style("font-weight", "300")//
-				.text(" " + person.fname.substring(0, maxLetter + 4 - (person.name.length + 1)))//
+				text.append("text") //
+				.style("font-size", d3gentree.param.general.fnameFontSize + "px") //
+				.attr("transform", "translate(" + x + "," + y + ") rotate(" + ((endA + startA) / 2 - 0.01 - Math.PI / 2) * 180 / (Math.PI) + " 0 0)") //
+				.style("font-weight", "bold") //
+				.attr("dy", d3gentree.param.general.fnameFontSize / 2) //
+				.text(person.name.substring(0, maxLetter + 4)).append("tspan") //
+				.style("font-weight", "300") //
+				.text(" " + person.fname.substring(0, maxLetter + 4 - (person.name.length + 1))) //
 			}
 		}
 	}
@@ -439,78 +439,106 @@ d3gentree.draw = function() {
 
 d3gentree.rotate_all = function(angle) {
 	d3gentree.currentangle += angle;
-	d3gentree.vis//
-	.transition()//
-	.duration(2000)//
+	d3gentree.vis //
+	.transition() //
+	.duration(2000) //
 	.attr("transform", "translate(" + d3gentree.w / 2 + "," + d3gentree.h / 2 + ")rotate(" + d3gentree.currentangle + ")")
 }
 
-d3gentree.redraw = function(){
+d3gentree.redraw = function() {
 	$("#container").empty();
 	d3gentree.currentangle = 0;
-	d3gentree.vis = d3.select("#container").append("svg:svg")//create the SVG element inside the <body>
-	.attr("width", d3gentree.w)//set the width and height of our visualization (these will be attributes of the <svg> tag
-	.attr("height", d3gentree.h)//
-	.attr("id", "svg")//
-	.append("svg:g")//make a group to hold our pie chart
-	.attr("transform", "translate(" + d3gentree.w / 2 + "," + d3gentree.h / 2 + ")")//move the center of the pie chart from 0, 0 to center or drawing area
+	d3gentree.vis = d3.select("#container").append("svg:svg") //create the SVG element inside the <body>
+	.attr("width", d3gentree.w) //set the width and height of our visualization (these will be attributes of the <svg> tag
+	.attr("height", d3gentree.h) //
+	.attr("id", "svg") //
+	.append("svg:g") //make a group to hold our pie chart
+	.attr("transform", "translate(" + d3gentree.w / 2 + "," + d3gentree.h / 2 + ")") //move the center of the pie chart from 0, 0 to center or drawing area
 
 	d3gentree.draw_center(0);
 	d3gentree.draw();
+}
+
+
+d3gentree.init_controller = function() {
+	var gui = new dat.GUI();
+	var controller = [];
+
+	var f0 = gui.addFolder('General')
+	controller.push(f0.addColor(d3gentree.param.general, 'strokeColor').name('Stroke color'));
+	controller.push(f0.add(d3gentree.param.general, 'displayAdditionalInfo').name('Show additional info'));
+	controller.push(f0.add(d3gentree.param.general, 'additionalInfoFontSize', 0, 20).step(1).name('Additional info font size'));
+	controller.push(f0.add(d3gentree.param.general, 'ascDescSpacing', 0, 100).step(1).name('Spacing Asc/Desc'));
+	controller.push(f0.add(d3gentree.param.general, 'radius', 20, 200).step(1).name('Radius of non radial cell'));
+	controller.push(f0.add(d3gentree.param.general, 'radiusRadial', 50, 400).step(1).name('Radius of radial cell'));
+	controller.push(f0.add(d3gentree.param.general, 'centerSize', 0, 400).step(1).name('Center size'));
+	controller.push(f0.add(d3gentree.param.general, 'nameFontSize', 1, 40).step(1).name('Name font size'));
+	controller.push(f0.add(d3gentree.param.general, 'fnameFontSize', 1, 40).step(1).name('First name font size'));
+	controller.push(f0.add(d3gentree.param.general, 'stopDisplayName', 1, 20).step(1).name('Stop display from generation'));
+	controller.push(f0.add(d3gentree.param.general, 'padding', 0, 10).name("Padding"));
+
+	var f1 = gui.addFolder('Ascendant Tree');
+	controller.push(f1.add(d3gentree.param.asc, 'oneLineNameStart', 0, 20).step(1).name('One line name from generation'));
+	controller.push(f1.add(d3gentree.param.asc, 'expandStart', 0, 10).step(1).name('Expand start'));
+	controller.push(f1.add(d3gentree.param.asc, 'spouseColorRatio', 0, 2).name('Spouse color ratio'));
+
+
+	var f2 = gui.addFolder('Descendant Tree');
+	controller.push(f2.add(d3gentree.param.desc, 'oneLineNameStart', 0, 20).step(1).name('One line name from generation'));
+	controller.push(f2.add(d3gentree.param.desc, 'expandStart', 0, 10).step(1).name('Expand start'));
+	controller.push(f2.add(d3gentree.param.desc, 'spouseRadiusRatio', 0, 2).name('Spouse radius ratio'));
+	controller.push(f2.add(d3gentree.param.desc, 'generationSpacing', 0, 20).name('Space between generations'));
+	controller.push(f2.add(d3gentree.param.desc, 'angle', 0, 2 * Math.PI).name('Angle'));
+	controller.push(f2.add(d3gentree.param.desc, 'sourceNb', 0, d3gentree.param.data.length - 1).step(1).name('Source number'));
+
+	for (var i = 0; i < controller.length; i++) {
+		controller[i].onFinishChange(function(value) {
+			// Fires when a controller loses focus.
+			d3gentree.redraw();
+		});
+	}
 }
 
 $(document).mousemove(function(e) {
 	d3gentree.mouseX = e.pageX + 15;
 	d3gentree.mouseY = e.pageY + 5;
 	$("#details").css("top", d3gentree.mouseY + "px").css("left", d3gentree.mouseX + "px");
-	if (d3gentree.isDragging){
+	if (d3gentree.isDragging) {
 		//var dx = e.pageX - d3gentree.xorig;
-    	//var dy = e.pageY - d3gentree.yorig;
-    	//var angle = Math.sqrt((dx * dx) + (dy * dy));
-    	if (e.pageX < d3gentree.w / 2)
-    		d3gentree.rotate_all(-1)
-    	else
-    		d3gentree.rotate_all(1)
-    	//d3gentree.xorig = e.pageX;
-		//d3gentree.yorig = e.pageY;
+		//var dy = e.pageY - d3gentree.yorig;
+		//var angle = Math.sqrt((dx * dx) + (dy * dy));
+		if (e.pageX < d3gentree.w / 2)
+			d3gentree.rotate_all(-1)
+		else
+			d3gentree.rotate_all(1)
+			//d3gentree.xorig = e.pageX;
+			//d3gentree.yorig = e.pageY;
 	}
-	
+
 })
-.mousedown(function(e) {
-    d3gentree.isDragging = true;
-})
-.mouseup(function(e) {
-    d3gentree.isDragging = false;
-});
+	.mousedown(function(e) {
+		d3gentree.isDragging = true;
+	})
+	.mouseup(function(e) {
+		d3gentree.isDragging = false;
+	});
+
 
 (function() {
 	d3gentree.param = new parameters();
-	
-	var gui = new dat.GUI();
-	var f1 = gui.addFolder('Ascendant Tree');
-	var controller1 = f1.add(d3gentree.param.asc, 'expandStart', 0, 10).step(1);
-	controller1.onFinishChange(function(value) {
-	  // Fires when a controller loses focus.
-	  d3gentree.redraw();
-	});
-	
-	var f2 = gui.addFolder('Descendant Tree');
-	var controller2 = f2.add(d3gentree.param.desc, 'expandStart', 0, 10).step(1);
-	controller2.onFinishChange(function(value) {
-	  // Fires when a controller loses focus.
-	  d3gentree.redraw();
-	});
-		
+
+	d3gentree.init_controller();
+
 	d3gentree.isDragging = false;
 	d3gentree.currentangle = 0;
 	d3gentree.compute_canvas_size(0);
 
-	d3gentree.vis = d3.select("#container").append("svg:svg")//create the SVG element inside the <body>
-	.attr("width", d3gentree.w)//set the width and height of our visualization (these will be attributes of the <svg> tag
-	.attr("height", d3gentree.h)//
-	.attr("id", "svg")//
-	.append("svg:g")//make a group to hold our pie chart
-	.attr("transform", "translate(" + d3gentree.w / 2 + "," + d3gentree.h / 2 + ")")//move the center of the pie chart from 0, 0 to center or drawing area
+	d3gentree.vis = d3.select("#container").append("svg:svg") //create the SVG element inside the <body>
+	.attr("width", d3gentree.w) //set the width and height of our visualization (these will be attributes of the <svg> tag
+	.attr("height", d3gentree.h) //
+	.attr("id", "svg") //
+	.append("svg:g") //make a group to hold our pie chart
+	.attr("transform", "translate(" + d3gentree.w / 2 + "," + d3gentree.h / 2 + ")") //move the center of the pie chart from 0, 0 to center or drawing area
 
 	d3gentree.draw_center(0);
 
@@ -541,4 +569,3 @@ $(document).mousemove(function(e) {
 	});
 
 })();
-
