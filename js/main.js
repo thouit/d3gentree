@@ -21,7 +21,7 @@ d3gentree.encode_as_img_and_link = function() {
 
 d3gentree.compute_canvas_size = function(sourceNb) {
 	if (d3gentree.param.data[sourceNb].source.ancestors.length < d3gentree.param.asc.expandStart) {
-		rMax = d3gentree.param.general.centerSize + d3gentree.param.general.radius * d3gentree.param.data[0].source.ancestors.length - d3gentree.param.general.padding / 2;
+		rMax = d3gentree.param.general.centerSize + d3gentree.param.general.radius * d3gentree.param.data[sourceNb].source.ancestors.length - d3gentree.param.general.padding / 2;
 	} else {
 		rMax = d3gentree.param.general.centerSize + d3gentree.param.general.radius * (d3gentree.param.asc.expandStart - 1) + d3gentree.param.general.radiusRadial * (d3gentree.param.data[sourceNb].source.ancestors.length - (d3gentree.param.asc.expandStart - 1)) - d3gentree.param.general.padding / 2;
 	}
@@ -29,7 +29,7 @@ d3gentree.compute_canvas_size = function(sourceNb) {
 	d3gentree.h = 2 * rMax + 50;
 }
 // Draw center element
-d3gentree.draw_center = function(sourceNb) {
+d3gentree.draw_center = function(pers) {
 	//add center text
 	var centerText = d3gentree.vis.append("g") //
 	.attr("class", "text") //
@@ -39,15 +39,14 @@ d3gentree.draw_center = function(sourceNb) {
 	.style("font-size", d3gentree.param.general.nameFontSize + "px") //
 	.style("font-weight", "bold") //
 	.attr("dy", -5).attr("text-anchor", "middle") //
-	.text(d3gentree.param.data[sourceNb].source.source.name.substring(0, Math.min((d3gentree.param.general.centerSize * 2 / 9) + 1, d3gentree.param.data[sourceNb].source.source.name.length + 1)));
+	.text(pers.name.substring(0, Math.min((d3gentree.param.general.centerSize * 2 / 9) + 1, pers.name.length + 1)));
 
 	centerText.append("text") //
 	.attr("dy", 15).style("font-size", d3gentree.param.general.fnameFontSize + "px") //
 	.attr("text-anchor", "middle") //
-	.text(d3gentree.param.data[sourceNb].source.source.fname.substring(0, Math.min((d3gentree.param.general.centerSize * 2 / 9) + 1, d3gentree.param.data[sourceNb].source.source.fname.length + 1)));
+	.text(pers.fname.substring(0, Math.min((d3gentree.param.general.centerSize * 2 / 9) + 1, pers.fname.length + 1)));
 }
-
-d3gentree.drawAscendants = function(dataSource, sosa, inR_orig, startA_orig, endA_orig, orient) {
+d3gentree.drawAscendants = function(dataSource, sourceNb, sosa, inR_orig, startA_orig, endA_orig, orient) {
 	generation = parseInt(sosa).toString(2).length - 1;
 	branch = sosa - Math.pow(2, generation);
 	if (generation > d3gentree.param.asc.expandStart) {
@@ -64,21 +63,19 @@ d3gentree.drawAscendants = function(dataSource, sosa, inR_orig, startA_orig, end
 		if (pers) {
 			dataSource.source.ancestors[generation - 1][branch].index = sosa;
 			invert = startA_orig <= 0 ? true : false
-			d3gentree.drawPersCell(pers, dataSource.sourceNb, inR_orig + d3gentree.param.general.padding / 2, outR - d3gentree.param.general.padding / 2, startA_orig, endA_orig, generation, orient, radialText, invert, true, false);
+			d3gentree.drawPersCell(pers, sourceNb, inR_orig + d3gentree.param.general.padding / 2, outR - d3gentree.param.general.padding / 2, startA_orig, endA_orig, generation, orient, radialText, invert, true, false);
 		}
 	}
 	if (generation < dataSource.source.ancestors.length) {
 		var midA = (startA_orig + endA_orig) / 2;
-		d3gentree.drawAscendants(dataSource, 2 * sosa, outR, startA_orig, midA, orient);
-		d3gentree.drawAscendants(dataSource, 2 * sosa + 1, outR, midA, endA_orig, orient);
+		d3gentree.drawAscendants(dataSource, sourceNb, 2 * sosa, outR, startA_orig, midA, orient);
+		d3gentree.drawAscendants(dataSource, sourceNb, 2 * sosa + 1, outR, midA, endA_orig, orient);
 	}
 }
 
 d3gentree.drawDescendant = function(indivData, sourceNb, inR_orig, startA_orig, endA_orig, generation, orient) {
-	// Divide arc per marriages
 	if (!indivData.index)
 		indivData.index = "0";
-	var nbSpouse = indivData.marriages.length;
 	if (generation > d3gentree.param.desc.expandStart ? d3gentree.param.general.radiusRadial : d3gentree.param.general.radius) {
 		var thisR = d3gentree.param.general.radiusRadial;
 		var radialText = 1;
@@ -86,7 +83,8 @@ d3gentree.drawDescendant = function(indivData, sourceNb, inR_orig, startA_orig, 
 		var thisR = d3gentree.param.general.radius;
 		var radialText = 0;
 	}
-	for (var m = 0; m < nbSpouse; ++m) {
+	var nbSpouse = indivData.marriages.length;
+	for (var m = 0; m < nbSpouse; ++m) {// Divide current person arc per marriages/spouse
 		lengthA = (endA_orig - startA_orig) / nbSpouse;
 		var startA_s = startA_orig + m * lengthA;
 		var endA_s = startA_orig + (m + 1) * lengthA;
@@ -96,8 +94,9 @@ d3gentree.drawDescendant = function(indivData, sourceNb, inR_orig, startA_orig, 
 		invert = startA_s > Math.PI ? true : false
 		d3gentree.drawPersCell(indivData.marriages[m].spouse, sourceNb, inR + d3gentree.param.general.padding / 2, outR_s - d3gentree.param.general.padding / 2, startA_s, endA_s, generation, (generation > d3gentree.param.desc.expandStart ? 1 : orient), (generation > d3gentree.param.desc.expandStart ? 1 : 0), invert, false, true)
 
-		for (var c = 0; c < indivData.marriages[m].children.length; ++c) {
-			lengthA_c = (endA_s - startA_s) / indivData.marriages[m].children.length;
+        var nbChildren =  indivData.marriages[m].children.length;
+		for (var c = 0; c < nbChildren; ++c) {
+			lengthA_c = (endA_s - startA_s) / nbChildren;
 			var startA = startA_s + c * lengthA_c;
 			var endA = startA_s + (c + 1) * lengthA_c;
 			var inR = outR_s + d3gentree.param.desc.generationSpacing;
@@ -110,7 +109,7 @@ d3gentree.drawDescendant = function(indivData, sourceNb, inR_orig, startA_orig, 
 	}
 }
 
-d3gentree.myarc = function(inR, outR, startA, endA, orient) {
+d3gentree.oriented_arc = function(inR, outR, startA, endA, orient) {
 	d3_arcOffset = 3 * Math.PI / 2;
 	if (startA > endA) {
 		t = endA;
@@ -137,7 +136,7 @@ d3gentree.drawPersCell = function(person, sourceNb, inR, outR, startA, endA, gen
 	var yShift = isAsc ? 0 : d3gentree.param.general.ascDescSpacing;
 
 	var elem = d3gentree.vis.append("svg:path") //
-	.attr("d", d3gentree.myarc(inR, outR, startA, endA, orient)) //
+	.attr("d", d3gentree.oriented_arc(inR, outR, startA, endA, orient)) //
 	.attr("transform", "translate(" + xShift + "," + yShift + ")") //
 	.attr("fill", function() {
 		if (isAsc) {
@@ -160,7 +159,7 @@ d3gentree.drawPersCell = function(person, sourceNb, inR, outR, startA, endA, gen
 
 	var spaceLength = lengthA * (isAsc ? outR : inR);
 	if (!radialText) {
-
+		
 		var maxLetter = spaceLength * 2 / d3gentree.param.general.fnameFontSize - 3;
 
 		var letterSpacingName = isAsc ? "1px" : "Opx"
@@ -220,12 +219,12 @@ d3gentree.drawPersCell = function(person, sourceNb, inR, outR, startA, endA, gen
 			}
 
 			if (person.marriages[0] != null && person.marriages[0].events != null && person.marriages[0].events.wedding != null) {
-				if (isAsc && person.gender == "F") {
+				if (isAsc && person.gender == "F"){
 					var elem = d3gentree.vis.append("svg:path") //
-					.attr("d", d3gentree.myarc(inR, outR, startA + (startA - endA), endA, orient)) //
+					.attr("d", d3gentree.oriented_arc(inR, outR, startA + (startA-endA), endA, orient)) //
 					.attr("transform", "translate(" + xShift + "," + yShift + ")") //
 					.style("fill", "none")
-						.style("stroke-width", 0) //
+					.style("stroke-width", 0) //
 					.attr("id", sourceNb + '_' + person.index + '_' + 'w');
 
 					//TODO: Make it transparent to events
@@ -235,7 +234,7 @@ d3gentree.drawPersCell = function(person, sourceNb, inR, outR, startA, endA, gen
 					text_m.append("text") //
 					.style("font-size", d3gentree.param.general.additionalInfoFontSize + "px") //
 					.attr("dx", spaceLength) //
-					.attr("dy", d3gentree.param.general.radius - d3gentree.param.general.additionalInfoFontSize / 3.0) //
+					.attr("dy", d3gentree.param.general.radius - d3gentree.param.general.additionalInfoFontSize/3.0) //
 					.attr("method", "stretch") //
 					.attr("spacing", "auto") //
 					.style("letter-spacing", "1px") //
@@ -257,8 +256,8 @@ d3gentree.drawPersCell = function(person, sourceNb, inR, outR, startA, endA, gen
 					.attr("xlink:href", "#" + sourceNb + '_' + person.index) //
 					.attr("text-anchor", "middle") //
 					.text("Mariés " + person.marriages[0].events.wedding.fulltextEvent);
-				}
 			}
+		}
 		}
 	} else {
 		var maxLetter = (outR - inR) * 1.5 / d3gentree.param.general.fnameFontSize;
@@ -315,9 +314,9 @@ d3gentree.drawPersCell = function(person, sourceNb, inR, outR, startA, endA, gen
 					}
 
 					if (person.marriages[0] != null && person.marriages[0].events != null && person.marriages[0].events.wedding != null) {
-						if (isAsc && person.gender == "F") {
+						if (isAsc && person.gender == "F"){
 							var elem = d3gentree.vis.append("svg:path") //
-							.attr("d", d3gentree.myarc(inR, outR, startA + (startA - endA), endA, orient)) //
+							.attr("d", d3gentree.oriented_arc(inR, outR, startA + (startA-endA), endA, orient)) //
 							.attr("transform", "translate(" + xShift + "," + yShift + ")") //
 							.style("fill", "none")
 							//.attr("fill-opacity", 0.2)
@@ -331,7 +330,7 @@ d3gentree.drawPersCell = function(person, sourceNb, inR, outR, startA, endA, gen
 							text_m.append("text") //
 							.style("font-size", d3gentree.param.general.additionalInfoFontSize + "px") //
 							.attr("dx", spaceLength) //
-							.attr("dy", d3gentree.param.general.radiusRadial - d3gentree.param.general.additionalInfoFontSize / 3.0) //
+							.attr("dy", d3gentree.param.general.radiusRadial - d3gentree.param.general.additionalInfoFontSize/3.0) //
 							.attr("method", "stretch") //
 							.attr("spacing", "auto") //
 							.style("letter-spacing", "1px") //
@@ -349,7 +348,7 @@ d3gentree.drawPersCell = function(person, sourceNb, inR, outR, startA, endA, gen
 							.append("textPath") //
 							.attr("xlink:href", "#" + sourceNb + '_' + person.index) //
 							.attr("text-anchor", "middle") //
-							.text("Mariés " + person.marriages[0].events.wedding.fulltextEvent);
+							.text("Mariés " + person.marriages[0].events.wedding.fulltextEvent);	
 						}
 					}
 				}
@@ -403,9 +402,9 @@ d3gentree.drawPersCell = function(person, sourceNb, inR, outR, startA, endA, gen
 					}
 
 					if (person.marriages[0] != null && person.marriages[0].events != null && person.marriages[0].events.wedding != null) {
-						if (isAsc && person.gender == "F") {
+						if (isAsc && person.gender == "F"){
 							var elem = d3gentree.vis.append("svg:path") //
-							.attr("d", d3gentree.myarc(inR, outR, startA + (startA - endA), endA, orient)) //
+							.attr("d", d3gentree.oriented_arc(inR, outR, startA + (startA-endA), endA, orient)) //
 							.attr("transform", "translate(" + xShift + "," + yShift + ")") //
 							.style("fill", "none")
 							//.attr("fill-opacity", 0.2)
@@ -419,7 +418,7 @@ d3gentree.drawPersCell = function(person, sourceNb, inR, outR, startA, endA, gen
 							text_m.append("text") //
 							.style("font-size", d3gentree.param.general.additionalInfoFontSize + "px") //
 							.attr("dx", spaceLength) //
-							.attr("dy", d3gentree.param.general.radiusRadial - d3gentree.param.general.additionalInfoFontSize / 3.0) //
+							.attr("dy", d3gentree.param.general.radiusRadial - d3gentree.param.general.additionalInfoFontSize/3.0) //
 							.attr("method", "stretch") //
 							.attr("spacing", "auto") //
 							.style("letter-spacing", "1px") //
@@ -437,7 +436,7 @@ d3gentree.drawPersCell = function(person, sourceNb, inR, outR, startA, endA, gen
 							.append("textPath") //
 							.attr("xlink:href", "#" + sourceNb + '_' + person.index) //
 							.attr("text-anchor", "middle") //
-							.text("Mariés " + person.marriages[0].events.wedding.fulltextEvent);
+							.text("Mariés " + person.marriages[0].events.wedding.fulltextEvent);	
 						}
 					}
 				}
@@ -483,7 +482,7 @@ d3gentree.getPersDataFromId = function(persId, sourceNb) {
 		branch = parseInt(persId) - Math.pow(2, generation);
 		return d3gentree.param.data[sourceNb].source.ancestors[generation - 1][branch];
 	} else {
-		function recAddress(obj, path) {
+		function recAddress(obj, path) { // Retrieve person from id in the recursive data array. (-2.5-1.2)  is 2nd spouse-5th child-1st spouse-2nd child. top-to-bottom
 			p = path.match(/(?:-(\d+)(?:\.(\d+))?)?(.*)/);
 			if (p[2])
 				return recAddress(obj.marriages[p[1]].children[p[2]], p[3]);
@@ -491,7 +490,6 @@ d3gentree.getPersDataFromId = function(persId, sourceNb) {
 				return obj.marriages[p[1]].spouse;
 			return obj;
 		}
-
 		return recAddress(d3gentree.param.data[sourceNb].source.source, persId.slice(1));
 	}
 }
@@ -515,32 +513,36 @@ d3gentree.writeDetails = function(dom, fromsvg) {
 	details.name = pers.name;
 	details.fname = pers.fname;
 	hoverString = "";
-	if (details.name != undefined)
-		hoverString += "<strong>" + details.name + "</strong> ";
-	if (details.fname != undefined)
-		hoverString += details.fname + "<br />"
-	if (details.brothers != undefined)
-		hoverString += details.brothers + "<br/>"
-	if (details.sosa != undefined)
-		hoverString += "Sosa : " + details.sosa + "<br /><br />"
-	if (pers.birth != undefined)
-		hoverString += d3gentree.formatEvent("Né ", pers.birth, "<br />")
-	if (pers.baptims != undefined)
-		hoverString += d3gentree.formatEvent("Baptisé ", pers.baptism, "<br />")
-	if (pers.death != undefined)
-		hoverString += d3gentree.formatEvent("Mort ", pers.death, "<br />")
-	if (pers.burial != undefined)
-		hoverString += d3gentree.formatEvent("Inhumé ", pers.burial, "<br />")
-	if (pers.mariage != undefined)
-		hoverString += d3gentree.formatEvent("Marié ", pers.mariage, "")
+    hoverString += d3gentree.formatIfNotEmpty("<strong>" , details.name, "</strong> ");
+    hoverString += d3gentree.formatIfNotEmpty("" , details.fname, "<br />");
+    hoverString += d3gentree.formatIfNotEmpty("" , details.brothers, "<br />");
+    hoverString += d3gentree.formatIfNotEmpty("Sosa : " , details.sosa, "<br /><br />");
+    hoverString += d3gentree.formatEvent(d3gentree.param.formatEventStr.birth[pers.gender], pers.birth, "<br />")
+    hoverString += d3gentree.formatEvent(d3gentree.param.formatEventStr.baptism[pers.gender], pers.baptism, "<br />")
+    hoverString += d3gentree.formatEvent(d3gentree.param.formatEventStr.death[pers.gender], pers.death, "<br />")
+    hoverString += d3gentree.formatEvent(d3gentree.param.formatEventStr.burial[pers.gender], pers.burial, "<br />")
+	for (m in pers.marriages){
+        if(!pers.marriages[m])continue;
+        hoverString += d3gentree.formatEvent(d3gentree.param.formatEventStr.wedding[pers.gender], m, "<br />")
+        hoverString += d3gentree.formatEvent(d3gentree.param.formatEventStr.wedding[pers.gender], pers.marriages[m].events.wedding, "<br />")
+       // hoverString += d3gentree.formatEvent(d3gentree.param.formatEventStr.divorce[pers.gender], pers.marriages[m].events.divorce, "<br />")
+    }
 	$("#details").html(hoverString);
 }
 
 d3gentree.formatEvent = function(prefix, e, suffix) {
-	return !e ? "" : d3gentree.preendIfPresent(prefix, d3gentree.preendIfPresent("à ", e.place, " ") + d3gentree.preendIfPresent("le ", e.date, ""), suffix);
+	return !e ? "" : d3gentree.formatIfNotEmpty(prefix, d3gentree.formatDate(" ", e.date, "") 
+        + d3gentree.formatIfNotEmpty(" à ", e.place, ""), suffix);
 }
 
-d3gentree.preendIfPresent = function(prefix, property, suffix) {
+d3gentree.formatDate =  function(prefix, e, suffix) {
+	if (!e) return  "" ;
+	if (e.length==4) return prefix + 'en '+e + suffix
+	if (e.match(/^\d+.*/)) return prefix + 'le '+e + suffix;
+	return prefix + e + suffix;
+}
+
+d3gentree.formatIfNotEmpty = function(prefix, property, suffix="") {
 	return !property ? "" : prefix + property + suffix;
 }
 
@@ -549,12 +551,21 @@ d3gentree.log2int = function(nb) {
 }
 
 d3gentree.draw = function() {
+	d3gentree.compute_canvas_size(0);//Compute size based on first file
+    d3gentree.vis = d3.select("#container").append("svg:svg") //create the SVG element inside the <body>
+        .attr("width", d3gentree.w) //set the width and height of our visualization (these will be attributes of the <svg> tag
+        .attr("height", d3gentree.h) //
+        .attr("id", "svg") //
+        .append("svg:g") //make a group to hold our pie chart
+        .attr("transform", "translate(" + d3gentree.w / 2 + "," + d3gentree.h / 2 + ")") //move the center of the pie chart from 0, 0 to center or drawing area
+
 	for (var i = 0; i < d3gentree.param.data.length; i++) {
-		d3gentree.drawAscendants(d3gentree.param.data[i], 1, d3gentree.param.general.centerSize, -d3gentree.param.data[i].angleStart + Math.PI / 2.0, -d3gentree.param.data[i].angleStop + Math.PI / 2.0, 1);
+		d3gentree.drawAscendants(d3gentree.param.data[i], i, 1, d3gentree.param.general.centerSize, -d3gentree.param.data[i].angleStart + Math.PI / 2.0, -d3gentree.param.data[i].angleStop + Math.PI / 2.0, 1);
 	}
 
-	d3gentree.drawDescendant(d3gentree.param.data[d3gentree.param.desc.sourceNb].source.source, d3gentree.param.data[d3gentree.param.desc.sourceNb].sourceNb, d3gentree.param.general.centerSize, Math.PI + d3gentree.param.desc.angle / 2, Math.PI - d3gentree.param.desc.angle / 2, 0, 0);
-
+	d3gentree.drawDescendant(d3gentree.param.data[d3gentree.param.desc.sourceNb].source.source, d3gentree.param.desc.sourceNb, d3gentree.param.general.centerSize, Math.PI + d3gentree.param.desc.angle / 2, Math.PI - d3gentree.param.desc.angle / 2, 0, 0);
+	d3gentree.draw_center(d3gentree.param.data[d3gentree.param.centerSourceId].source.source);
+	linkTooltipBox();
 	setTimeout(d3gentree.encode_as_img_and_link, 1000);
 }
 
@@ -568,15 +579,7 @@ d3gentree.rotate_all = function(angle) {
 
 d3gentree.redraw = function() {
 	$("#container").empty();
-	d3gentree.currentangle = 0;
-	d3gentree.vis = d3.select("#container").append("svg:svg") //create the SVG element inside the <body>
-	.attr("width", d3gentree.w) //set the width and height of our visualization (these will be attributes of the <svg> tag
-	.attr("height", d3gentree.h) //
-	.attr("id", "svg") //
-	.append("svg:g") //make a group to hold our pie chart
-	.attr("transform", "translate(" + d3gentree.w / 2 + "," + d3gentree.h / 2 + ")") //move the center of the pie chart from 0, 0 to center or drawing area
-
-	d3gentree.draw_center(0);
+	d3gentree.currentangle = 0;	
 	d3gentree.draw();
 }
 
@@ -643,35 +646,31 @@ $(document).mousemove(function(e) {
 		d3gentree.isDragging = false;
 	});
 
-
 (function() {
 	d3gentree.param = new parameters();
-
+	//Download data files
+	d3gentree.loadedSources=0;
+    for (var data_entry in d3gentree.param.data){
+        var url="data/"+d3gentree.param.data[data_entry].source;
+        jQuery.getJSON(url, [] ,(function (index) {return function (responseData){
+            alert(JSON.stringify(responseData));
+            alert(index);
+            d3gentree.param.data[index].source = responseData;
+            d3gentree.loadedSources++;
+            if(d3gentree.loadedSources==d3gentree.param.data.length)
+                d3gentree.draw();
+        }})(data_entry));
+    }
 	d3gentree.init_controller();
 
 	d3gentree.isDragging = false;
 	d3gentree.currentangle = 0;
-	d3gentree.compute_canvas_size(0);
-
-	d3gentree.vis = d3.select("#container").append("svg:svg") //create the SVG element inside the <body>
-	.attr("width", d3gentree.w) //set the width and height of our visualization (these will be attributes of the <svg> tag
-	.attr("height", d3gentree.h) //
-	.attr("id", "svg") //
-	.append("svg:g") //make a group to hold our pie chart
-	.attr("transform", "translate(" + d3gentree.w / 2 + "," + d3gentree.h / 2 + ")") //move the center of the pie chart from 0, 0 to center or drawing area
-
-	d3gentree.draw_center(0);
-
-	d3gentree.draw();
-
-	var svg_xml = (new XMLSerializer()).serializeToString(document.getElementById("svg"));
-
-	//display source code
-	//$("#code").text(svg_xml.replace(/’/g, "'").replace(/&nbsp;/g, " "));
-
+	
 	d3gentree.mouseX
 	d3gentree.mouseY
+})();
 
+function linkTooltipBox(){
 	$("g.text").hover(function() {
 		$(this).prev().svg().addClass("hover");
 		d3gentree.writeDetails($(this), true);
@@ -687,5 +686,4 @@ $(document).mousemove(function(e) {
 	}, function() {
 		$("#details").css("display", "none");
 	});
-
-})();
+}
