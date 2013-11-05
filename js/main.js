@@ -1,4 +1,4 @@
-var d3gentree = d3gentree || {};
+﻿var d3gentree = d3gentree || {};
 
 d3gentree.encode_as_img_and_link = function() {
 	// Add some critical information
@@ -243,7 +243,21 @@ d3gentree.drawPersCell = function(person, sourceNb, inR, outR, startA, endA, gen
 					.attr("text-anchor", "middle") //
 					.text("Mariés " + person.marriages[0].events.wedding.fulltextEvent);
 				}
+			} else if (!isAsc && (!isSpouse || generation == 0)) {
+				//NOT Tested
+				if (person.marriages[0] != null && person.marriages[0].events != null && person.marriages[0].events.wedding != null) {
+					text.append("text") //
+					.style("font-size", d3gentree.param.general.additionalInfoFontSize + "px") //
+					.attr("dx", spaceLength) //
+					.attr("dy", d3gentree.param.general.additionalInfoFontSize) //
+					.attr("method", "stretch") //
+					.attr("spacing", "auto") //
+					.append("textPath") //
+					.attr("xlink:href", "#" + sourceNb + '_' + person.index) //
+					.attr("text-anchor", "middle") //
+					.text("Mariés " + person.marriages[0].events.wedding.fulltextEvent);
 			}
+		}
 		}
 	} else {
 		var maxLetter = (outR - inR) * 1.5 / d3gentree.param.general.fnameFontSize;
@@ -451,7 +465,8 @@ d3gentree.drawPersCell = function(person, sourceNb, inR, outR, startA, endA, gen
 				.attr("transform", "translate(" + x + "," + y + ") rotate(" + ((endA + startA) / 2 - 0.01 - Math.PI / 2) * 180 / (Math.PI) + " 0 0)") //
 				.style("font-weight", "bold") //
 				.attr("dy", d3gentree.param.general.fnameFontSize / 2) //
-				.text(person.name.substring(0, maxLetter + 4)).append("tspan") //
+				.text(person.name.substring(0, maxLetter + 4)) //
+				.append("tspan") //
 				.style("font-weight", "300") //
 				.text(" " + person.fname.substring(0, maxLetter + 4 - (person.name.length + 1))) //
 			}
