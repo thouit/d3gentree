@@ -75,10 +75,8 @@ d3gentree.drawAscendants = function(dataSource, sosa, inR_orig, startA_orig, end
 }
 
 d3gentree.drawDescendant = function(indivData, sourceNb, inR_orig, startA_orig, endA_orig, generation, orient) {
-	// Divide arc per marriages
 	if (!indivData.index)
 		indivData.index = "0";
-	var nbSpouse = indivData.marriages.length;
 	if (generation > d3gentree.param.desc.expandStart ? d3gentree.param.general.radiusRadial : d3gentree.param.general.radius) {
 		var thisR = d3gentree.param.general.radiusRadial;
 		var radialText = 1;
@@ -86,7 +84,8 @@ d3gentree.drawDescendant = function(indivData, sourceNb, inR_orig, startA_orig, 
 		var thisR = d3gentree.param.general.radius;
 		var radialText = 0;
 	}
-	for (var m = 0; m < nbSpouse; ++m) {
+	var nbSpouse = indivData.marriages.length;
+	for (var m = 0; m < nbSpouse; ++m) {// Divide current person arc per marriages/spouse
 		lengthA = (endA_orig - startA_orig) / nbSpouse;
 		var startA_s = startA_orig + m * lengthA;
 		var endA_s = startA_orig + (m + 1) * lengthA;
@@ -96,8 +95,9 @@ d3gentree.drawDescendant = function(indivData, sourceNb, inR_orig, startA_orig, 
 		invert = startA_s > Math.PI ? true : false
 		d3gentree.drawPersCell(indivData.marriages[m].spouse, sourceNb, inR + d3gentree.param.general.padding / 2, outR_s - d3gentree.param.general.padding / 2, startA_s, endA_s, generation, (generation > d3gentree.param.desc.expandStart ? 1 : orient), (generation > d3gentree.param.desc.expandStart ? 1 : 0), invert, false, true)
 
-		for (var c = 0; c < indivData.marriages[m].children.length; ++c) {
-			lengthA_c = (endA_s - startA_s) / indivData.marriages[m].children.length;
+        var nbChildren =  indivData.marriages[m].children.length;
+		for (var c = 0; c < nbChildren; ++c) {
+			lengthA_c = (endA_s - startA_s) / nbChildren;
 			var startA = startA_s + c * lengthA_c;
 			var endA = startA_s + (c + 1) * lengthA_c;
 			var inR = outR_s + d3gentree.param.desc.generationSpacing;
@@ -110,7 +110,7 @@ d3gentree.drawDescendant = function(indivData, sourceNb, inR_orig, startA_orig, 
 	}
 }
 
-d3gentree.myarc = function(inR, outR, startA, endA, orient) {
+d3gentree.oriented_arc = function(inR, outR, startA, endA, orient) {
 	d3_arcOffset = 3 * Math.PI / 2;
 	if (startA > endA) {
 		t = endA;
@@ -137,7 +137,7 @@ d3gentree.drawPersCell = function(person, sourceNb, inR, outR, startA, endA, gen
 	var yShift = isAsc ? 0 : d3gentree.param.general.ascDescSpacing;
 
 	var elem = d3gentree.vis.append("svg:path") //
-	.attr("d", d3gentree.myarc(inR, outR, startA, endA, orient)) //
+	.attr("d", d3gentree.oriented_arc(inR, outR, startA, endA, orient)) //
 	.attr("transform", "translate(" + xShift + "," + yShift + ")") //
 	.attr("fill", function() {
 		if (isAsc) {
@@ -222,7 +222,7 @@ d3gentree.drawPersCell = function(person, sourceNb, inR, outR, startA, endA, gen
 			if (person.marriages[0] != null && person.marriages[0].events != null && person.marriages[0].events.wedding != null) {
 				if (isAsc && person.gender == "F"){
 					var elem = d3gentree.vis.append("svg:path") //
-					.attr("d", d3gentree.myarc(inR, outR, startA + (startA-endA), endA, orient)) //
+					.attr("d", d3gentree.oriented_arc(inR, outR, startA + (startA-endA), endA, orient)) //
 					.attr("transform", "translate(" + xShift + "," + yShift + ")") //
 					.style("fill", "none")
 					.style("stroke-width", 0) //
@@ -303,7 +303,7 @@ d3gentree.drawPersCell = function(person, sourceNb, inR, outR, startA, endA, gen
 					if (person.marriages[0] != null && person.marriages[0].events != null && person.marriages[0].events.wedding != null) {
 						if (isAsc && person.gender == "F"){
 							var elem = d3gentree.vis.append("svg:path") //
-							.attr("d", d3gentree.myarc(inR, outR, startA + (startA-endA), endA, orient)) //
+							.attr("d", d3gentree.oriented_arc(inR, outR, startA + (startA-endA), endA, orient)) //
 							.attr("transform", "translate(" + xShift + "," + yShift + ")") //
 							.style("fill", "none")
 							//.attr("fill-opacity", 0.2)
@@ -391,7 +391,7 @@ d3gentree.drawPersCell = function(person, sourceNb, inR, outR, startA, endA, gen
 					if (person.marriages[0] != null && person.marriages[0].events != null && person.marriages[0].events.wedding != null) {
 						if (isAsc && person.gender == "F"){
 							var elem = d3gentree.vis.append("svg:path") //
-							.attr("d", d3gentree.myarc(inR, outR, startA + (startA-endA), endA, orient)) //
+							.attr("d", d3gentree.oriented_arc(inR, outR, startA + (startA-endA), endA, orient)) //
 							.attr("transform", "translate(" + xShift + "," + yShift + ")") //
 							.style("fill", "none")
 							//.attr("fill-opacity", 0.2)
@@ -468,7 +468,7 @@ d3gentree.getPersDataFromId = function(persId, sourceNb) {
 		branch = parseInt(persId) - Math.pow(2, generation);
 		return d3gentree.param.data[sourceNb].source.ancestors[generation - 1][branch];
 	} else {
-		function recAddress(obj, path) {
+		function recAddress(obj, path) { // Retrieve person from id in the recursive data array. (-2.5-1.2)  is 2nd spouse-5th child-1st spouse-2nd child. top-to-bottom
 			p = path.match(/(?:-(\d+)(?:\.(\d+))?)?(.*)/);
 			if (p[2])
 				return recAddress(obj.marriages[p[1]].children[p[2]], p[3]);
@@ -476,7 +476,6 @@ d3gentree.getPersDataFromId = function(persId, sourceNb) {
 				return obj.marriages[p[1]].spouse;
 			return obj;
 		}
-
 		return recAddress(d3gentree.param.data[sourceNb].source.source, persId.slice(1));
 	}
 }
@@ -500,32 +499,36 @@ d3gentree.writeDetails = function(dom, fromsvg) {
 	details.name = pers.name;
 	details.fname = pers.fname;
 	hoverString = "";
-	if (details.name != undefined)
-		hoverString += "<strong>" + details.name + "</strong> ";
-	if (details.fname != undefined)
-		hoverString += details.fname + "<br />"
-	if (details.brothers != undefined)
-		hoverString += details.brothers + "<br/>"
-	if (details.sosa != undefined)
-		hoverString += "Sosa : " + details.sosa + "<br /><br />"
-	if (pers.birth != undefined)
-		hoverString += d3gentree.formatEvent("Né ", pers.birth, "<br />")
-	if (pers.baptims != undefined)
-		hoverString += d3gentree.formatEvent("Baptisé ", pers.baptism, "<br />")
-	if (pers.death != undefined)
-		hoverString += d3gentree.formatEvent("Mort ", pers.death, "<br />")
-	if (pers.burial != undefined)
-		hoverString += d3gentree.formatEvent("Inhumé ", pers.burial, "<br />")
-	if (pers.mariage != undefined)
-		hoverString += d3gentree.formatEvent("Marié ", pers.mariage, "")
+    hoverString += d3gentree.formatIfNotEmpty("<strong>" , details.name, "</strong> ");
+    hoverString += d3gentree.formatIfNotEmpty("" , details.fname, "<br />");
+    hoverString += d3gentree.formatIfNotEmpty("" , details.brothers, "<br />");
+    hoverString += d3gentree.formatIfNotEmpty("Sosa : " , details.sosa, "<br /><br />");
+    hoverString += d3gentree.formatEvent(d3gentree.param.formatEventStr.birth[pers.gender], pers.birth, "<br />")
+    hoverString += d3gentree.formatEvent(d3gentree.param.formatEventStr.baptism[pers.gender], pers.baptism, "<br />")
+    hoverString += d3gentree.formatEvent(d3gentree.param.formatEventStr.death[pers.gender], pers.death, "<br />")
+    hoverString += d3gentree.formatEvent(d3gentree.param.formatEventStr.burial[pers.gender], pers.burial, "<br />")
+	for (m in pers.marriages){
+        if(!pers.marriages[m])continue;
+        hoverString += d3gentree.formatEvent(d3gentree.param.formatEventStr.wedding[pers.gender], m, "<br />")
+        hoverString += d3gentree.formatEvent(d3gentree.param.formatEventStr.wedding[pers.gender], pers.marriages[m].events.wedding, "<br />")
+       // hoverString += d3gentree.formatEvent(d3gentree.param.formatEventStr.divorce[pers.gender], pers.marriages[m].events.divorce, "<br />")
+    }
 	$("#details").html(hoverString);
 }
 
 d3gentree.formatEvent = function(prefix, e, suffix) {
-	return !e ? "" : d3gentree.preendIfPresent(prefix, d3gentree.preendIfPresent("à ", e.place, " ") + d3gentree.preendIfPresent("le ", e.date, ""), suffix);
+	return !e ? "" : d3gentree.formatIfNotEmpty(prefix, d3gentree.formatDate(" ", e.date, "") 
+        + d3gentree.formatIfNotEmpty(" à ", e.place, ""), suffix);
 }
 
-d3gentree.preendIfPresent = function(prefix, property, suffix) {
+d3gentree.formatDate =  function(prefix, e, suffix) {
+	if (!e) return  "" ;
+	if (e.length==4) return prefix + 'en '+e + suffix
+	if (e.match(/^\d+.*/)) return prefix + 'le '+e + suffix;
+	return prefix + e + suffix;
+}
+
+d3gentree.formatIfNotEmpty = function(prefix, property, suffix="") {
 	return !property ? "" : prefix + property + suffix;
 }
 

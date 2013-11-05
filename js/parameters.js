@@ -32,4 +32,11 @@ var parameters = function() {
 		//{source: data2, angleStart: 0.3*Math.PI, angleStop: 0.7*Math.PI, sourceNb: "1"},
 		//{source: data3, angleStart: 0.7*Math.PI, angleStop: Math.PI*1.1, sourceNb: "2"},
 	];
+	this.formatEventStr = {  birth:{H: "Né", F:"Née",'?': "Né"},
+                                        baptism:{H: "Baptisé", F:"Baptisée",'?': "Baptisé"},
+                                        death:{H: "Décédé", F:"Décédée",'?': "Décédé"},
+                                        burial:{H: "Inhumé", F:"Inhumée",'?': "Inhumé"},
+                                        wedding:{H: "Marié", F:"Mariée",'?': "Marié"},
+                                        divorce:{H: "Divorcé", F:"Divorcée",'?': "Divorcé"},
+    };
 }; 
