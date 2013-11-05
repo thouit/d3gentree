@@ -1,4 +1,4 @@
-﻿var d3gentree = d3gentree || {};
+var d3gentree = d3gentree || {};
 
 d3gentree.encode_as_img_and_link = function() {
 	// Add some critical information
@@ -653,8 +653,8 @@ $(document).mousemove(function(e) {
     for (var data_entry in d3gentree.param.data){
         var url="data/"+d3gentree.param.data[data_entry].source;
         jQuery.getJSON(url, [] ,(function (index) {return function (responseData){
-            alert(JSON.stringify(responseData));
-            alert(index);
+            //alert(JSON.stringify(responseData));
+            //alert(index);
             d3gentree.param.data[index].source = responseData;
             d3gentree.loadedSources++;
             if(d3gentree.loadedSources==d3gentree.param.data.length)
