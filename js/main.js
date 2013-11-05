@@ -1,4 +1,4 @@
-﻿var d3gentree = d3gentree || {};
+var d3gentree = d3gentree || {};
 
 d3gentree.encode_as_img_and_link = function() {
 	// Add some critical information
@@ -21,7 +21,7 @@ d3gentree.encode_as_img_and_link = function() {
 
 d3gentree.compute_canvas_size = function(sourceNb) {
 	if (d3gentree.param.data[sourceNb].source.ancestors.length < d3gentree.param.asc.expandStart) {
-		rMax = d3gentree.param.general.centerSize + d3gentree.param.general.radius * d3gentree.param.data[0].source.ancestors.length - d3gentree.param.general.padding / 2;
+		rMax = d3gentree.param.general.centerSize + d3gentree.param.general.radius * d3gentree.param.data[sourceNb].source.ancestors.length - d3gentree.param.general.padding / 2;
 	} else {
 		rMax = d3gentree.param.general.centerSize + d3gentree.param.general.radius * (d3gentree.param.asc.expandStart - 1) + d3gentree.param.general.radiusRadial * (d3gentree.param.data[sourceNb].source.ancestors.length - (d3gentree.param.asc.expandStart - 1)) - d3gentree.param.general.padding / 2;
 	}
@@ -29,7 +29,7 @@ d3gentree.compute_canvas_size = function(sourceNb) {
 	d3gentree.h = 2 * rMax + 50;
 }
 // Draw center element
-d3gentree.draw_center = function(sourceNb) {
+d3gentree.draw_center = function(pers) {
 	//add center text
 	var centerText = d3gentree.vis.append("g") //
 	.attr("class", "text") //
@@ -39,15 +39,14 @@ d3gentree.draw_center = function(sourceNb) {
 	.style("font-size", d3gentree.param.general.nameFontSize + "px") //
 	.style("font-weight", "bold") //
 	.attr("dy", -5).attr("text-anchor", "middle") //
-	.text(d3gentree.param.data[sourceNb].source.source.name.substring(0, Math.min((d3gentree.param.general.centerSize * 2 / 9) + 1, d3gentree.param.data[sourceNb].source.source.name.length + 1)));
+	.text(pers.name.substring(0, Math.min((d3gentree.param.general.centerSize * 2 / 9) + 1, pers.name.length + 1)));
 
 	centerText.append("text") //
 	.attr("dy", 15).style("font-size", d3gentree.param.general.fnameFontSize + "px") //
 	.attr("text-anchor", "middle") //
-	.text(d3gentree.param.data[sourceNb].source.source.fname.substring(0, Math.min((d3gentree.param.general.centerSize * 2 / 9) + 1, d3gentree.param.data[sourceNb].source.source.fname.length + 1)));
+	.text(pers.fname.substring(0, Math.min((d3gentree.param.general.centerSize * 2 / 9) + 1, pers.fname.length + 1)));
 }
-
-d3gentree.drawAscendants = function(dataSource, sosa, inR_orig, startA_orig, endA_orig, orient) {
+d3gentree.drawAscendants = function(dataSource, sourceNb, sosa, inR_orig, startA_orig, endA_orig, orient) {
 	generation = parseInt(sosa).toString(2).length - 1;
 	branch = sosa - Math.pow(2, generation);
 	if (generation > d3gentree.param.asc.expandStart) {
@@ -64,13 +63,13 @@ d3gentree.drawAscendants = function(dataSource, sosa, inR_orig, startA_orig, end
 		if (pers) {
 			dataSource.source.ancestors[generation - 1][branch].index = sosa;
 			invert = startA_orig <= 0 ? true : false
-			d3gentree.drawPersCell(pers, dataSource.sourceNb, inR_orig + d3gentree.param.general.padding / 2, outR - d3gentree.param.general.padding / 2, startA_orig, endA_orig, generation, orient, radialText, invert, true, false);
+			d3gentree.drawPersCell(pers, sourceNb, inR_orig + d3gentree.param.general.padding / 2, outR - d3gentree.param.general.padding / 2, startA_orig, endA_orig, generation, orient, radialText, invert, true, false);
 		}
 	}
 	if (generation < dataSource.source.ancestors.length) {
 		var midA = (startA_orig + endA_orig) / 2;
-		d3gentree.drawAscendants(dataSource, 2 * sosa, outR, startA_orig, midA, orient);
-		d3gentree.drawAscendants(dataSource, 2 * sosa + 1, outR, midA, endA_orig, orient);
+		d3gentree.drawAscendants(dataSource, sourceNb, 2 * sosa, outR, startA_orig, midA, orient);
+		d3gentree.drawAscendants(dataSource, sourceNb, 2 * sosa + 1, outR, midA, endA_orig, orient);
 	}
 }
 
@@ -537,12 +536,21 @@ d3gentree.log2int = function(nb) {
 }
 
 d3gentree.draw = function() {
+	d3gentree.compute_canvas_size(0);//Compute size based on first file
+    d3gentree.vis = d3.select("#container").append("svg:svg") //create the SVG element inside the <body>
+        .attr("width", d3gentree.w) //set the width and height of our visualization (these will be attributes of the <svg> tag
+        .attr("height", d3gentree.h) //
+        .attr("id", "svg") //
+        .append("svg:g") //make a group to hold our pie chart
+        .attr("transform", "translate(" + d3gentree.w / 2 + "," + d3gentree.h / 2 + ")") //move the center of the pie chart from 0, 0 to center or drawing area
+
 	for (var i = 0; i < d3gentree.param.data.length; i++) {
-		d3gentree.drawAscendants(d3gentree.param.data[i], 1, d3gentree.param.general.centerSize, -d3gentree.param.data[i].angleStart + Math.PI / 2.0, -d3gentree.param.data[i].angleStop + Math.PI / 2.0, 1);
+		d3gentree.drawAscendants(d3gentree.param.data[i], i, 1, d3gentree.param.general.centerSize, -d3gentree.param.data[i].angleStart + Math.PI / 2.0, -d3gentree.param.data[i].angleStop + Math.PI / 2.0, 1);
 	}
 
-	d3gentree.drawDescendant(d3gentree.param.data[d3gentree.param.desc.sourceNb].source.source, d3gentree.param.data[d3gentree.param.desc.sourceNb].sourceNb, d3gentree.param.general.centerSize, Math.PI + d3gentree.param.desc.angle / 2, Math.PI - d3gentree.param.desc.angle / 2, 0, 0);
-
+	d3gentree.drawDescendant(d3gentree.param.data[d3gentree.param.desc.sourceNb].source.source, d3gentree.param.desc.sourceNb, d3gentree.param.general.centerSize, Math.PI + d3gentree.param.desc.angle / 2, Math.PI - d3gentree.param.desc.angle / 2, 0, 0);
+	d3gentree.draw_center(d3gentree.param.data[d3gentree.param.centerSourceId].source.source);
+	linkTooltipBox();
 	setTimeout(d3gentree.encode_as_img_and_link, 1000);
 }
 
@@ -556,15 +564,7 @@ d3gentree.rotate_all = function(angle) {
 
 d3gentree.redraw = function() {
 	$("#container").empty();
-	d3gentree.currentangle = 0;
-	d3gentree.vis = d3.select("#container").append("svg:svg") //create the SVG element inside the <body>
-	.attr("width", d3gentree.w) //set the width and height of our visualization (these will be attributes of the <svg> tag
-	.attr("height", d3gentree.h) //
-	.attr("id", "svg") //
-	.append("svg:g") //make a group to hold our pie chart
-	.attr("transform", "translate(" + d3gentree.w / 2 + "," + d3gentree.h / 2 + ")") //move the center of the pie chart from 0, 0 to center or drawing area
-
-	d3gentree.draw_center(0);
+	d3gentree.currentangle = 0;	
 	d3gentree.draw();
 }
 
@@ -631,35 +631,31 @@ $(document).mousemove(function(e) {
 		d3gentree.isDragging = false;
 	});
 
-
 (function() {
 	d3gentree.param = new parameters();
-
+	//Download data files
+	d3gentree.loadedSources=0;
+    for (var data_entry in d3gentree.param.data){
+        var url="data/"+d3gentree.param.data[data_entry].source;
+        jQuery.getJSON(url, [] ,(function (index) {return function (responseData){
+            alert(JSON.stringify(responseData));
+            alert(index);
+            d3gentree.param.data[index].source = responseData;
+            d3gentree.loadedSources++;
+            if(d3gentree.loadedSources==d3gentree.param.data.length)
+                d3gentree.draw();
+        }})(data_entry));
+    }
 	d3gentree.init_controller();
 
 	d3gentree.isDragging = false;
 	d3gentree.currentangle = 0;
-	d3gentree.compute_canvas_size(0);
-
-	d3gentree.vis = d3.select("#container").append("svg:svg") //create the SVG element inside the <body>
-	.attr("width", d3gentree.w) //set the width and height of our visualization (these will be attributes of the <svg> tag
-	.attr("height", d3gentree.h) //
-	.attr("id", "svg") //
-	.append("svg:g") //make a group to hold our pie chart
-	.attr("transform", "translate(" + d3gentree.w / 2 + "," + d3gentree.h / 2 + ")") //move the center of the pie chart from 0, 0 to center or drawing area
-
-	d3gentree.draw_center(0);
-
-	d3gentree.draw();
-
-	var svg_xml = (new XMLSerializer()).serializeToString(document.getElementById("svg"));
-
-	//display source code
-	//$("#code").text(svg_xml.replace(/’/g, "'").replace(/&nbsp;/g, " "));
-
+	
 	d3gentree.mouseX
 	d3gentree.mouseY
+})();
 
+function linkTooltipBox(){
 	$("g.text").hover(function() {
 		$(this).prev().svg().addClass("hover");
 		d3gentree.writeDetails($(this), true);
@@ -675,5 +671,4 @@ $(document).mousemove(function(e) {
 	}, function() {
 		$("#details").css("display", "none");
 	});
-
-})();
+}
