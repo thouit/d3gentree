@@ -542,7 +542,7 @@ d3gentree.formatDate =  function(prefix, e, suffix) {
 	return prefix + e + suffix;
 }
 
-d3gentree.formatIfNotEmpty = function(prefix, property, suffix="") {
+d3gentree.formatIfNotEmpty = function(prefix, property, suffix) {
 	return !property ? "" : prefix + property + suffix;
 }
 
