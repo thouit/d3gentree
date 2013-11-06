@@ -11,6 +11,8 @@ var parameters = function() {
 		fnameFontSize: 10, // font size for the first name
 		stopDisplayName: 9, // when to stop to display any information
 		padding: 0.1, //
+		interParentsMargin: 1, // in pixels
+		interParentsMarginOnlyNewGen: true, // if we create gap only for non already separated persons
 	};
 	this.asc = {
 		colors: [[250, 250, 250]], // colors per generation

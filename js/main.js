@@ -8,8 +8,10 @@ d3gentree.encode_as_img_and_link = function() {
 		"xmlns:xlink": "http://www.w3.org/1999/xlink"
 	});
 	xmlHeader = '<?xml version="1.0" encoding="Latin1"?>';
-
+    currentHTML= $("#svg").parent().html();
+    d3gentree.inkskapeWorkaround();
 	var b64 = btoa(xmlHeader + $("#svg").parent().html().replace(/’/g, "'").replace(/&nbsp;/g, " "));
+	$("#svg").parent().html(currentHTML);
 	// or use btoa if supported
 
 	// Works in recent Webkit(Chrome)
@@ -18,7 +20,11 @@ d3gentree.encode_as_img_and_link = function() {
 	$(".download").remove();
 	$("body").append($("<div class='download'><a href-lang='image/svg+xml' href='data:image/svg+xml;base64,\n" + b64 + "' title='file.svg' download='file.svg'>Download as svg</a></div>"));
 }
-
+d3gentree.inkskapeWorkaround= function() {
+    $("#svg textPath[text-anchor='middle']").parent().each(function (){
+        this.setAttribute('dx',this.getAttribute('dx')*2);
+    })
+}
 d3gentree.compute_canvas_size = function(sourceNb) {
 	if (d3gentree.param.data[sourceNb].source.ancestors.length < d3gentree.param.asc.expandStart) {
 		rMax = d3gentree.param.general.centerSize + d3gentree.param.general.radius * d3gentree.param.data[sourceNb].source.ancestors.length - d3gentree.param.general.padding / 2;
@@ -66,10 +72,22 @@ d3gentree.drawAscendants = function(dataSource, sourceNb, sosa, inR_orig, startA
 			d3gentree.drawPersCell(pers, sourceNb, inR_orig + d3gentree.param.general.padding / 2, outR - d3gentree.param.general.padding / 2, startA_orig, endA_orig, generation, orient, radialText, invert, true, false);
 		}
 	}
+	if (!d3gentree.param.general.interParentsMarginOnlyNewGen){
+        var coupleMargin0=d3gentree.param.general.interParentsMargin/inR_orig;
+        var coupleMargin1=d3gentree.param.general.interParentsMargin/inR_orig;
+	}else{
+        if (sosa%2==0){//Check if there is already a gap for each parents
+            var coupleMargin0=0;
+            var coupleMargin1=d3gentree.param.general.interParentsMargin/inR_orig;
+        }else{
+            var coupleMargin0=d3gentree.param.general.interParentsMargin/inR_orig;
+            var coupleMargin1=0;
+            }
+	}
 	if (generation < dataSource.source.ancestors.length) {
-		var midA = (startA_orig + endA_orig) / 2;
-		d3gentree.drawAscendants(dataSource, sourceNb, 2 * sosa, outR, startA_orig, midA, orient);
-		d3gentree.drawAscendants(dataSource, sourceNb, 2 * sosa + 1, outR, midA, endA_orig, orient);
+		var midA = (startA_orig + endA_orig+coupleMargin0+coupleMargin1) / 2;
+		d3gentree.drawAscendants(dataSource, sourceNb, 2 * sosa, outR, startA_orig-coupleMargin0, midA, orient);
+		d3gentree.drawAscendants(dataSource, sourceNb, 2 * sosa + 1, outR, midA, endA_orig+coupleMargin1, orient);
 	}
 }
 
@@ -599,6 +617,8 @@ d3gentree.init_controller = function() {
 	controller.push(f0.add(d3gentree.param.general, 'fnameFontSize', 1, 40).step(1).name('First name font size'));
 	controller.push(f0.add(d3gentree.param.general, 'stopDisplayName', 1, 20).step(1).name('Stop display from generation'));
 	controller.push(f0.add(d3gentree.param.general, 'padding', 0, 10).name("Padding"));
+	controller.push(f0.add(d3gentree.param.general, 'interParentsMargin', 0, 10).name("Inter-parent margin"));
+	controller.push(f0.add(d3gentree.param.general, 'interParentsMarginOnlyNewGen', 0, 1).name("Less inter-parent margin"));
 
 	var f1 = gui.addFolder('Ascendant Tree');
 	controller.push(f1.add(d3gentree.param.asc, 'oneLineNameStart', 0, 20).step(1).name('One line name from generation'));
