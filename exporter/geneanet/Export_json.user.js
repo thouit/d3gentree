@@ -147,7 +147,7 @@ function doneDescTable(){
 }
 function done(){
         var data={'source':DescTable[0],'ancestors':AncTable.slice(1)};
-        var typedArray = JSON.stringify(data); //your csv as a string
+        var typedArray = "var data = "+JSON.stringify(data); //your csv as a string
         var blob = new Blob([typedArray], {type: "text/javascript"});
         var url = URL.createObjectURL(blob);
         var a = document.querySelector("#dlJSON"); // the id of the <a> element where you will render the download link

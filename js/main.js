@@ -718,17 +718,29 @@ $(document).mousemove(function(e) {
 (function() {
 	d3gentree.param = new parameters();
 	//Download data files
-	d3gentree.loadedSources=0;
-    for (var data_entry in d3gentree.param.data){
-        var url="data/"+d3gentree.param.data[data_entry].source;
-        jQuery.getJSON(url, [] ,(function (index) {return function (responseData){
-            //alert(JSON.stringify(responseData));
-            //alert(index);
-            d3gentree.param.data[index].source = responseData;
-            d3gentree.loadedSources++;
-            if(d3gentree.loadedSources==d3gentree.param.data.length)
-                d3gentree.draw();
-        }})(data_entry));
+	if(d3gentree.param.data[0].source.substring){// The source field is a string
+        d3gentree.loadedSources=0;
+        for (var data_entry in d3gentree.param.data){
+            var url="data/"+d3gentree.param.data[data_entry].source;
+            var script = document.createElement('script');  
+            script.id = 'uploadScript'+data_entry;  
+            script.type = 'text/javascript';  
+            script.src = url;  
+            script.onload = (function (index) {
+                return function (){
+                    //alert(index+" "+JSON.stringify(data));
+                    //alert(index);
+                    d3gentree.param.data[index].source = data;
+                    d3gentree.loadedSources++;
+                    if(d3gentree.loadedSources==d3gentree.param.data.length)
+                            d3gentree.draw();
+                    }
+            })(data_entry);    
+            document.getElementsByTagName("head")[0].appendChild(script);  
+        }
+    }else{// The source field is directly the data
+            // Just draw
+            d3gentree.draw();
     }
 	d3gentree.init_controller();
 
