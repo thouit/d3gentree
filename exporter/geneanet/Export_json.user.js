@@ -14,7 +14,7 @@ KnownEventKeyWord={ "Né":"birth",
                     "Baptisé":"baptism",
                     "Décédé":"death",
                     "Inhumé":"burial"};
-IgnoredEventKeyword=["Parenté"];
+IgnoredEventKeyword=["Parenté","Âge"];
 AncTable=[];LinkTable=[];DescTable=[];StructTable=[];
 ToDoAsc=0;ToDoDesc=0;
 function getAncestors(NbGeneration){
