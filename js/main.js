@@ -31,6 +31,21 @@ d3gentree.compute_canvas_size = function(sourceNb) {
 	} else {
 		rMax = d3gentree.param.general.centerSize + d3gentree.param.general.radius * (d3gentree.param.asc.expandStart - 1) + d3gentree.param.general.radiusRadial * (d3gentree.param.data[sourceNb].source.ancestors.length - (d3gentree.param.asc.expandStart - 1)) - d3gentree.param.general.padding / 2;
 	}
+    function depthRec(indivData,curR,generation){
+        var maxR=curR;
+        for (var m = 0; m < indivData.marriages.length; ++m) {
+            var outR_s = curR + (generation > d3gentree.param.desc.expandStart ? d3gentree.param.general.radiusRadial : d3gentree.param.general.radius) * (generation > d3gentree.param.desc.expandStart ? d3gentree.param.desc.spouseRadiusRatio : 1);
+            maxR=Math.max(maxR,outR_s);
+            for (var c = 0; c < indivData.marriages[m].children.length; ++c) {
+                var inR = outR_s + d3gentree.param.desc.generationSpacing;
+                var outR = inR + (generation + 1 > d3gentree.param.desc.expandStart ? d3gentree.param.general.radiusRadial : d3gentree.param.general.radius);
+                var R=depthRec(indivData.marriages[m].children[c],outR,generation+2);
+                maxR=Math.max(maxR,R);
+            }
+        }
+        return maxR;
+    }
+	rMax=Math.max(rMax,depthRec(d3gentree.param.data[sourceNb].source.source,d3gentree.param.general.centerSize,0));
 	d3gentree.w = 2 * rMax + 50;
 	d3gentree.h = 2 * rMax + 50;
 }
