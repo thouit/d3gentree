@@ -9,8 +9,9 @@ d3gentree.encode_as_img_and_link = function() {
 	});
 	xmlHeader = '<?xml version="1.0" encoding="Latin1"?>';
     currentHTML= $("#svg").parent().html();
-    d3gentree.inkskapeWorkaround();
 	var b64 = btoa(xmlHeader + $("#svg").parent().html().replace(/’/g, "'").replace(/&nbsp;/g, " "));
+    d3gentree.inkskapeWorkaround();
+	var b64_inkscape = btoa(xmlHeader + $("#svg").parent().html().replace(/’/g, "'").replace(/&nbsp;/g, " "));
 	$("#svg").parent().html(currentHTML);
 	// or use btoa if supported
 
@@ -18,7 +19,40 @@ d3gentree.encode_as_img_and_link = function() {
 	//$("body").append($("<img src='data:image/svg+xml;base64,\n"+b64+"' alt='file.svg'/>"));
 	// Works in Firefox 3.6 and Webkit and possibly any browser which supports the data-uri
 	$(".download").remove();
-	$("body").append($("<div class='download'><a href-lang='image/svg+xml' href='data:image/svg+xml;base64,\n" + b64 + "' title='file.svg' download='file.svg'>Download as svg</a></div>"));
+	$("body").append($("<div class='download'><a id='dlSVG'  href-lang='image/svg+xml' href='data:image/svg+xml;base64,\n" + b64_inkscape + "' title='file.svg' download='file.svg'>Download as svg</a></div>"));
+	// Add a download as png link
+            $(".download").append($("<br /><a href='javascript:d3gentree.toPNG()'>Download as png</a>"));
+	
+}
+d3gentree.toPNG = function (){
+// Set up our canvas on the page before doing anything.
+        var myCanvas = document.createElement('canvas');
+        var finalW=prompt("Quel doit �tre la largeur finale en pixel ?");
+        scale=finalW/d3gentree.w;
+        myCanvas.width = d3gentree.w*scale;
+        myCanvas.height = d3gentree.h*scale;
+        
+        document.getElementsByTagName('body') [0].appendChild(myCanvas);
+        // Get drawing context for the Canvas
+        var myCanvasContext = myCanvas.getContext('2d');
+        myCanvasContext.scale = scale;
+        // Load up our image as dataURI
+        // Create a Data URI.
+        xmlHeader = '<?xml version="1.0" encoding="Latin1"?>';
+        currentHTML= $("#svg").parent().html();
+        var b64 = btoa(xmlHeader + currentHTML.replace(/’/g, "'").replace(/&nbsp;/g, " "));
+        var mySrc = "data:image/svg+xml;base64,\n" + b64;
+        // Load up our image.
+        var source = new Image();
+        source.src = mySrc;
+        // Render our SVG image to the canvas once it loads.
+        source.onload = function(){
+            myCanvasContext.drawImage(source,0,0,myCanvas.width,myCanvas.height);
+            var imgPNGstr = myCanvas.toDataURL("image/png");
+            var uriContent = "data:image/png;base64," + btoa(imgPNGstr);
+            $(".download").append($("<br /><a id='dlPNG' href-lang='image/svg+xml' href='" + uriContent + "' title='file.png' download='file.png'> </a>"));
+             $("#dlPNG").click();
+        }   
 }
 d3gentree.inkskapeWorkaround= function() {
     $("#svg textPath[text-anchor='middle']").parent().each(function (){
