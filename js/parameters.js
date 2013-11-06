@@ -21,7 +21,8 @@ var parameters = function() {
 		spouseColorRatio: 1.05,
 	};
 	this.desc = {
-		colors: {"H": ["rgb(250, 250, 255)", "rgb(250, 250, 255)"], "F": ["rgb(255, 255, 255)", "rgb(255, 255, 255)"]}, // Color per gender and then {spouse, direct child}
+		colors: {   H: ["rgb(235, 235, 255)", "rgb(215, 215, 255)"], 
+                        F: ["rgb(255, 235, 235)", "rgb(255, 215, 215)"]}, // Color per gender and then {spouse, direct child}
 		oneLineNameStart: 5, // When to use one line to display the name instead of two for the descendance
 		expandStart: 0, // when to switch to radial view for descendants
 		spouseRadiusRatio: 0.8,
@@ -31,7 +32,7 @@ var parameters = function() {
 	};
 	this.centerSourceId = 0; // Source file of the central person
 	this.data = [
-		{source: 'data.js', angleStart: -0.1*Math.PI, angleStop: 1.1*Math.PI},
+		{source: 'data.papi.js', angleStart: -0.0*Math.PI, angleStop: 1.0*Math.PI},
 		//{source: 'data.papi.js', angleStart: 0.3*Math.PI, angleStop: 0.7*Math.PI},
 		//{source: data3, angleStart: 0.7*Math.PI, angleStop: Math.PI*1.1, sourceNb: "2"},
 	];
