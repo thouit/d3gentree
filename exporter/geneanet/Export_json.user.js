@@ -2,7 +2,7 @@
 // @name        Export_json
 // @namespace   Geneanet_enhanced
 // @include     http://gw.geneanet.org/*
-// @version     1.3
+// @version     1.4
 // @grant       GM_xmlhttpRequest
 // @downloadURL http://people.inf.ethz.ch/bjacquet/other/Display/Export_json.user.js
 // @require     http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js
@@ -10,7 +10,7 @@
 Option={'placeRemoveZipCode':true,
         'placeRemoveFrance':true,
         'addEmptyEvents':false}
-KnownEventKeyWord={  "Né":"birth",
+KnownEventKeyWord={ "Né":"birth",
                     "Baptisé":"baptism",
                     "Décédé":"death",
                     "Inhumé":"burial"};
@@ -133,7 +133,7 @@ function doneDescTable(){
         for(m in StructTable[i].marriages){
             marriageObj=StructTable[i].marriages[m];//contain the marriage with keys instead of peoples
             mar={spouse:DescTable[marriageObj.spouse],children:[]};
-            spName=mar.spouse.fname+" "+mar.spouse.name;            
+            spName=removeDiacritics(mar.spouse.fname+" "+mar.spouse.name);            
             //if(!DescTable[i].marriages[spName]) continue;
             mar.events=DescTable[i].marriages[spName].events;
             for(c in marriageObj.children)
@@ -147,7 +147,7 @@ function doneDescTable(){
 }
 function done(){
         var data={'source':DescTable[0],'ancestors':AncTable.slice(1)};
-        var typedArray = "var data = "+JSON.stringify(data)+";"; //your csv as a string
+        var typedArray = JSON.stringify(data); //your csv as a string
         var blob = new Blob([typedArray], {type: "text/javascript"});
         var url = URL.createObjectURL(blob);
         var a = document.querySelector("#dlJSON"); // the id of the <a> element where you will render the download link
@@ -165,24 +165,23 @@ function getPersJsonObj(pageContext,spouseName=''){
         lname=$("h2.name a",pageContext).next();
         if(!lname.text().trim().length) lname=$("h2.name",pageContext).nextUntil('h2').find('a[href*="m=N"]');
         myPersObj={
-    		"fname" : fname.text(),
-    		"name" : lname.text(),
-    		"gender":$("h2.name",pageContext).find("img")[0].alt};
-		for(var key in KnownEventKeyWord){
+            "fname" : fname.text(),
+            "name" : lname.text(),
+            "gender":$("h2.name",pageContext).find("img")[0].alt};
+        for(var key in KnownEventKeyWord){
             ExtractEventFromPersAttribute(myPersObj, key, KnownEventKeyWord[key], pageContext);
         }
         ExtractOccupationFromPersAttribute(myPersObj, "occupation", IgnoredEventKeyword, pageContext)
         marriagesEv=[];
         $("h2:contains('Union') + ul>li",pageContext).each(function(i,elem){
             thisObj=$(elem,pageContext);
-            conj=thisObj.find('a[href*="p="]').not('a[href*="m="]').first().justtext().replace(/  /,' ');
+            conj=removeDiacritics(thisObj.find('a[href*="p="]').not('a[href*="m="]').first().justtext().replace(/  /,' '));
             mevent=EventSplitText(thisObj.children('em').first().text().replace(/^([^ ]+) , /,"$1 - "));
             marriagesEv[conj]={events:{wedding:mevent}};
-            deventTxt=thisObj.children('em').slice(1);
-            if(deventTxt.prev().is('A')) deventTxt.length=0;
-            if(deventTxt.length){
-                devent=EventSplitText(deventTxt.text().replace(/^([^ ]+) , /,"$1 - "));
-                marriagesEv[conj].events.divorce=devent;
+            divorce_event=thisObj.children('em').slice(1);
+            if(divorce_event.prev().is('A')) divorce_event.length=0;
+            if(divorce_event.length){
+                marriagesEv[conj].events.divorce=EventSplitText(divorce_event.text().replace(/^([^ ]+) , /,"$1 - "));
             }
         });
         //alert(JSON.stringify(marriagesEv[conj]));
@@ -203,23 +202,23 @@ function ExtractEventFromPersAttribute(myPersObj, keyword, destAttr, context){
     eventFull=$("hr.separateur",context).next().find('ul').first().find('li:contains("'+keyword+'")').text();
     //alert(xquerypath+':contains("'+keyword+'")');
     if(eventFull.trim().length || Option.addEmptyEvents){
-		myPersObj[destAttr]=EventSplitText(eventFull);
-	}
-	//alert(JSON.stringify(myPersObj));
+        myPersObj[destAttr]=EventSplitText(eventFull);
+    }
+    //alert(JSON.stringify(myPersObj));
 }
 
 function ExtractOccupationFromPersAttribute(myPersObj, destAttr, IgnoredEventKeyword, context){
     events=$("hr.separateur",context).next().find('ul').first().find('li').toArray();
     for (e in events){
-    	//alert(e+" "+events[e]);  
+        //alert(e+" "+events[e]);  
         evtxtstart=$(events[e]).text().trim().split(' ')[0];
         if ((!evtxtstart.length) || ($.inArray(evtxtstart, Object.keys(KnownEventKeyWord) )>-1 )
                                  || ($.inArray(evtxtstart.slice(0,-1), Object.keys(KnownEventKeyWord) )>-1 )
                                  || ($.inArray(evtxtstart,IgnoredEventKeyword) >-1) )
             continue;
-    	myPersObj[destAttr]=$(events[e]).text();
-	}
-	//alert(JSON.stringify(myPersObj));
+        myPersObj[destAttr]=$(events[e]).text();
+    }
+    //alert(JSON.stringify(myPersObj));
 }
 
 function EventSplitText(text){
