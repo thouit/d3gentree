@@ -21,7 +21,8 @@ d3gentree.encode_as_img_and_link = function() {
 	$(".download").remove();
 	$("body").append($("<div class='download'><a id='dlSVG'  href-lang='image/svg+xml' href='data:image/svg+xml;base64,\n" + b64_inkscape + "' title='file.svg' download='file.svg'>Download as svg</a></div>"));
 	// Add a download as png link
-            $(".download").append($("<br /><a href='javascript:d3gentree.toPNG()'>Download as png</a>"));
+	$(".download_png").remove();
+    $("body").append($("<div class='download_png'><a href='javascript:d3gentree.toPNG()'>Download as png</a></div>"));
 	
 }
 d3gentree.toPNG = function (){

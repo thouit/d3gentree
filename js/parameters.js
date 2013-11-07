@@ -32,7 +32,7 @@ var parameters = function() {
 	};
 	this.centerSourceId = 0; // Source file of the central person
 	this.data = [
-		{source: 'data.papi.js', angleStart: -0.0*Math.PI, angleStop: 1.0*Math.PI},
+		{source: 'data.js', angleStart: -0.0*Math.PI, angleStop: 1.0*Math.PI},
 		//{source: 'data.papi.js', angleStart: 0.3*Math.PI, angleStop: 0.7*Math.PI},
 		//{source: data3, angleStart: 0.7*Math.PI, angleStop: Math.PI*1.1, sourceNb: "2"},
 	];

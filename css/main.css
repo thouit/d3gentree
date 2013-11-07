@@ -117,6 +117,21 @@ svg{
     font-weight: 300;
 }
 
+.download_png{
+    position: fixed;
+    top: 60px;
+    left: 10px;
+}
+.download_png a {
+    color: #333;
+    text-decoration: none;
+    background: #EEE;
+    padding:10px;
+    border: solid 1px #CCC;
+    font-size: 10px;
+    font-weight: 300;
+}
+
 /* ==========================================================================
    Media Queries
    ========================================================================== */
